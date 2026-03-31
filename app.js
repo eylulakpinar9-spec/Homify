@@ -56,6 +56,10 @@ function saveDB() {
 }
 
 window.toggleFavorite = function(listingId) {
+    if (!activeUserId) {
+        window.location.href = 'login.html';
+        return;
+    }
     if (!DB.Favorites) DB.Favorites = [];
     const index = DB.Favorites.findIndex(f => f.UserID === activeUserId && f.ListingID === listingId);
     
@@ -72,6 +76,10 @@ window.toggleFavorite = function(listingId) {
 };
 
 window.applyToListing = function(listingId) {
+    if (!activeUserId) {
+        window.location.href = 'login.html';
+        return;
+    }
     if (!DB.Applications) DB.Applications = [];
     const alreadyApplied = DB.Applications.some(a => a.UserID === activeUserId && a.ListingID === listingId);
     
@@ -92,11 +100,22 @@ window.applyToListing = function(listingId) {
     alert("Application sent successfully!");
 };
 
-let activeUserId = 2; // Default mock user (Mehmet Kaya)
+let activeUserId = null; // No default user
 try {
     const savedUser = localStorage.getItem('activeUserId');
     if (savedUser) activeUserId = parseInt(savedUser);
 } catch(e) {}
+
+if (window.location.pathname.endsWith('login.html')) {
+    localStorage.removeItem('activeUserId');
+    activeUserId = null;
+} else if (!activeUserId && 
+    (window.location.pathname.endsWith('profile.html') || 
+     window.location.pathname.endsWith('favorites.html') || 
+     window.location.pathname.endsWith('my-listings.html') || 
+     window.location.pathname.endsWith('messages.html'))) {
+    window.location.href = 'login.html';
+}
 
 // --- CORE QUERIES AS REQUIRED ---
 
@@ -419,9 +438,11 @@ window.renderFavorites = function() {
 };
 
 window.renderUserProfile = function() {
+    if (!activeUserId) return;
     const userDisplays = document.querySelectorAll('.user-profile span');
     const userUserImages = document.querySelectorAll('.user-profile img');
-    const currentUser = DB.Users.find(u => u.UserID === activeUserId) || DB.Users[0];
+    const currentUser = DB.Users.find(u => u.UserID === activeUserId);
+    if (!currentUser) return;
     
     userDisplays.forEach(el => { el.innerText = currentUser.Name; });
     userUserImages.forEach(el => { el.src = "https://api.dicebear.com/7.x/notionists/svg?seed=" + currentUser.Name.replace(/\s+/g,''); });
@@ -488,11 +509,40 @@ window.renderMyListings = function() {
 document.addEventListener('DOMContentLoaded', () => {
     window.globalScrollObserver = setupScrollReveal();
     setupThemeSwitch();
-    renderUserProfile();
+    
+    if (!activeUserId) {
+        // Adjust UI for guest mode
+        const profileLinks = document.querySelectorAll('a[href="profile.html"].user-profile');
+        profileLinks.forEach(link => link.style.display = 'none');
+        
+        const logoutBtns = document.querySelectorAll('a[href="login.html"].view-apps-btn');
+        logoutBtns.forEach(btn => {
+            if(btn.querySelector('ion-icon[name="log-out-outline"]')) {
+                btn.innerHTML = 'Sign In';
+                btn.style.padding = '0.5rem 1rem';
+                btn.style.borderRadius = 'var(--radius-sm)';
+                btn.style.background = 'var(--accent)';
+                btn.style.color = 'var(--bg-color)';
+                btn.style.border = 'none';
+            }
+        });
+        
+        const navLinks = document.querySelectorAll('.nav-links a');
+        navLinks.forEach(link => {
+            if (link.getAttribute('href') !== 'index.html' && !link.classList.contains('active')) {
+                link.style.display = 'none';
+            }
+        });
+    } else {
+        renderUserProfile();
+    }
+    
     renderStats();
     renderListings();
-    renderFavorites();
-    renderMyListings();
+    if (activeUserId) {
+        renderFavorites();
+        renderMyListings();
+    }
     setupModal();
 
     // Events for Search / Filtering
