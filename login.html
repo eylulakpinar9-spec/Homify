@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homiefy | Login</title>
+    <!-- Import Inter Font for modern Neative aesthetic -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script>
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+</head>
+<body>
+    <!-- Navbar (Simplified for login) -->
+    <nav class="navbar reveal">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon"><ion-icon name="home"></ion-icon></div>
+                <span>Homiefy</span>
+            </a>
+            <button id="themeToggle" class="theme-switch" aria-label="Toggle Theme">
+                <ion-icon name="sunny" class="sun-icon"></ion-icon>
+                <ion-icon name="moon" class="moon-icon"></ion-icon>
+            </button>
+        </div>
+    </nav>
+
+    <main class="container" style="display: flex; justify-content: center; align-items: center; min-height: 70vh;">
+        <div class="bento-box bg-white border-radius-large reveal" style="width: 100%; max-width: 450px; padding: 3rem; text-align: center; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1); border: 1px solid var(--border-color);">
+            <h1 class="ultra-title" style="font-size: 2.5rem; margin-bottom: 0.5rem; color: var(--text-primary)">Welcome back</h1>
+            <p class="subtitle" style="margin-bottom: 2rem;">Sign in to your Homiefy account</p>
+            
+            <form id="loginForm" style="display: flex; flex-direction: column; gap: 1rem;">
+                <input type="email" id="loginEmail" placeholder="Email Address" required style="padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-primary); font-size: 1rem; outline: none; transition: border-color 0.2s;">
+                <input type="password" placeholder="Password" required style="padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-primary); font-size: 1rem; outline: none; transition: border-color 0.2s;">
+                <button type="submit" class="btn-primary" style="margin-top: 1rem; width: 100%; justify-content: center; padding: 1.2rem;">
+                    <span class="btn-text">Sign In <ion-icon name="log-in-outline"></ion-icon></span>
+                    <div class="wave-bg"></div>
+                </button>
+            </form>
+            
+            <p style="margin-top: 2rem; color: var(--text-muted); font-size: 0.9rem;">
+                Don't have an account? <a href="#" style="color: var(--text-primary); font-weight: 600; text-decoration: none;">Sign up</a>
+            </p>
+        </div>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>

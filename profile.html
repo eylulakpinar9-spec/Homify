@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homiefy | Profile</title>
+    <!-- Import Inter Font for modern Neative aesthetic -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script>
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar reveal">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon"><ion-icon name="home"></ion-icon></div>
+                <span>Homiefy</span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html">Listings</a>
+                <a href="my-listings.html">My Listings</a>
+                <a href="favorites.html">Favorites</a>
+                <a href="messages.html">Messages</a>
+            </div>
+            <div class="nav-actions">
+                <button id="themeToggle" class="theme-switch" aria-label="Toggle Theme">
+                    <ion-icon name="sunny" class="sun-icon"></ion-icon>
+                    <ion-icon name="moon" class="moon-icon"></ion-icon>
+                </button>
+                <a href="profile.html" class="user-profile active" style="text-decoration: none;">
+                    <span>John Doe</span>
+                    <img src="https://api.dicebear.com/7.x/notionists/svg?seed=John" alt="Avatar" class="avatar">
+                </a>
+                <a href="login.html" class="view-apps-btn" style="text-decoration: none;">
+                    <ion-icon name="log-out-outline"></ion-icon>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section class="reveal delay-1">
+            <div class="section-header">
+                <h2>Your Profile</h2>
+            </div>
+            
+            <div class="bento-grid grid-1-2">
+                <!-- User Info -->
+                <div class="bento-box bg-white border-radius-large" style="text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 1rem;">
+                    <img src="https://api.dicebear.com/7.x/notionists/svg?seed=John" alt="Avatar" style="width: 120px; height: 120px; border-radius: 50%; background: var(--bg-color); border: 2px solid var(--border-color);" class="avatar">
+                    <div>
+                        <h3 id="profileName" style="font-size: 1.5rem; font-weight: 800;">John Doe</h3>
+                        <p id="profileEmail" style="color: var(--text-muted); font-size: 0.9rem;">john@example.com</p>
+                    </div>
+                    
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; margin-top: 1rem;">
+                        <span id="profileAgeGender" class="category-badge" style="position: static; font-size: 0.8rem;">Age: 24 | Male</span>
+                        <span class="category-badge" style="position: static; font-size: 0.8rem;">Joined 2026</span>
+                    </div>
+
+                    <div style="margin-top: auto; padding-top: 2rem; width: 100%;">
+                        <button class="view-apps-btn" style="width: 100%; justify-content: center; border: 1px solid var(--border-color);">
+                            Change Password <ion-icon name="key-outline"></ion-icon>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Profile Preferences Form -->
+                <div class="bento-box bg-white border-radius-large">
+                    <h3 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 2rem;">Lifestyle & Preferences</h3>
+                    
+                    <form id="profileForm" style="display: flex; flex-direction: column; gap: 1.5rem;" onsubmit="event.preventDefault(); alert('Profile preferences saved!');">
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                            <label style="font-weight: 600; font-size: 0.9rem;">Biography</label>
+                            <textarea id="prefBio" placeholder="Tell potential roommates about yourself..." rows="4" style="padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-primary); font-size: 1rem; outline: none; resize: vertical;"></textarea>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                <label style="font-weight: 600; font-size: 0.9rem;">Occupation</label>
+                                <input type="text" id="prefOcc" placeholder="e.g. Software Engineer" style="padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-primary); font-size: 1rem; outline: none;">
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                <label style="font-weight: 600; font-size: 0.9rem;">Sleep Schedule</label>
+                                <select style="padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-primary); font-size: 1rem; outline: none;">
+                                    <option value="early">Early Bird (10 PM - 6 AM)</option>
+                                    <option value="night">Night Owl (2 AM - 10 AM)</option>
+                                    <option value="regular" selected>Regular (12 AM - 8 AM)</option>
+                                    <option value="irregular">Irregular / Shifts</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                            <label style="font-weight: 600; font-size: 0.9rem;">Cleanliness Level (1-5)</label>
+                            <input type="range" min="1" max="5" value="4" style="width: 100%; cursor: pointer;">
+                            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; opacity: 0.7;">
+                                <span>1 - Relaxed</span>
+                                <span>5 - Spotless</span>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-primary" style="margin-top: 1rem; align-self: flex-end;">
+                            <span class="btn-text">Save Profile <ion-icon name="save-outline"></ion-icon></span>
+                            <div class="wave-bg"></div>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homiefy | Favorites</title>
+    <!-- Import Inter Font for modern Neative aesthetic -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script>
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar reveal">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon"><ion-icon name="home"></ion-icon></div>
+                <span>Homiefy</span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html">Listings</a>
+                <a href="my-listings.html">My Listings</a>
+                <a href="favorites.html" class="active">Favorites</a>
+                <a href="messages.html">Messages</a>
+            </div>
+            <div class="nav-actions">
+                <button id="themeToggle" class="theme-switch" aria-label="Toggle Theme">
+                    <ion-icon name="sunny" class="sun-icon"></ion-icon>
+                    <ion-icon name="moon" class="moon-icon"></ion-icon>
+                </button>
+                <a href="profile.html" class="user-profile" style="text-decoration: none;">
+                    <span>John Doe</span>
+                    <img src="https://api.dicebear.com/7.x/notionists/svg?seed=John" alt="Avatar" class="avatar">
+                </a>
+                <a href="login.html" class="view-apps-btn" style="text-decoration: none;">
+                    <ion-icon name="log-out-outline"></ion-icon>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section class="listings-section reveal delay-1">
+            <div class="section-header">
+                <h2>Your Favorites</h2>
+                <div class="filter-chip" id="favoritesCount">0 saved</div>
+            </div>
+            
+            <div class="listings-grid" id="favoritesGrid">
+                <!-- Dynamically populated by app.js renderFavorites() -->
+            </div>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>

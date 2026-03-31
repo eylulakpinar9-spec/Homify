@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homiefy | Messages</title>
+    <!-- Import Inter Font for modern Neative aesthetic -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script>
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+</head>
+<body style="height: 100vh; display: flex; flex-direction: column; overflow: hidden;">
+    <!-- Navbar -->
+    <nav class="navbar reveal" style="flex-shrink: 0; margin-bottom: 0;">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon"><ion-icon name="home"></ion-icon></div>
+                <span>Homiefy</span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html">Listings</a>
+                <a href="my-listings.html">My Listings</a>
+                <a href="favorites.html">Favorites</a>
+                <a href="messages.html" class="active">Messages</a>
+            </div>
+            <div class="nav-actions">
+                <button id="themeToggle" class="theme-switch" aria-label="Toggle Theme">
+                    <ion-icon name="sunny" class="sun-icon"></ion-icon>
+                    <ion-icon name="moon" class="moon-icon"></ion-icon>
+                </button>
+                <a href="profile.html" class="user-profile" style="text-decoration: none;">
+                    <span>John Doe</span>
+                    <img src="https://api.dicebear.com/7.x/notionists/svg?seed=John" alt="Avatar" class="avatar">
+                </a>
+                <a href="login.html" class="view-apps-btn" style="text-decoration: none;">
+                    <ion-icon name="log-out-outline"></ion-icon>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container reveal delay-1 messages-layout">
+        
+        <!-- Inbox Sidebar -->
+        <div class="bento-box bg-white border-radius-large" style="width: 350px; padding: 1.5rem; display: flex; flex-direction: column; flex-shrink: 0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+            <h3 style="font-weight: 800; font-size: 1.5rem; margin-bottom: 1.5rem;">Inbox</h3>
+            
+            <div style="display: flex; flex-direction: column; gap: 0.5rem; overflow-y: auto;">
+                <div style="padding: 1rem; border-radius: var(--radius-sm); background: var(--bg-color); border: 1px solid var(--border-color); cursor: pointer; display: flex; gap: 1rem; align-items: center;">
+                    <img src="https://api.dicebear.com/7.x/notionists/svg?seed=Ayse" style="width: 40px; height: 40px; border-radius: 50%; background: var(--card-bg);" alt="Avatar">
+                    <div>
+                        <h4 style="font-size: 1rem; font-weight: 700;">Ayse Kaya</h4>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;">Is the room still available?</p>
+                    </div>
+                </div>
+
+                <div style="padding: 1rem; border-radius: var(--radius-sm); border: 1px solid transparent; cursor: pointer; display: flex; gap: 1rem; align-items: center; transition: background 0.2s;">
+                    <img src="https://api.dicebear.com/7.x/notionists/svg?seed=Mehmet" style="width: 40px; height: 40px; border-radius: 50%; background: var(--bg-color);" alt="Avatar">
+                    <div>
+                        <h4 style="font-size: 1rem; font-weight: 700;">Mehmet Demir</h4>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;">Perfect, see you tomorrow.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="bento-box bg-white border-radius-large" style="flex: 1; padding: 0; display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--border-color); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+            <div style="padding: 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 1rem;">
+                <img src="https://api.dicebear.com/7.x/notionists/svg?seed=Ayse" style="width: 40px; height: 40px; border-radius: 50%; background: var(--bg-color);" alt="Avatar">
+                <h4 style="font-size: 1.2rem; font-weight: 700;">Ayse Kaya</h4>
+                <span class="category-badge" style="position: static; margin-left: auto; font-size: 0.7rem;">Regarding: Sunny Room near Campus</span>
+            </div>
+
+            <div style="flex: 1; padding: 2rem; background: var(--bg-color); overflow-y: auto; display: flex; flex-direction: column; gap: 1rem;">
+                <!-- Chat bubbles -->
+                <div style="align-self: flex-start; background: var(--card-bg); padding: 1rem; border-radius: var(--radius-sm); max-width: 70%; border: 1px solid var(--border-color);">
+                    <p style="font-size: 0.95rem;">Hi! I saw your listing for the room in Besiktas. Is it still available for next month?</p>
+                    <span style="font-size: 0.7rem; color: var(--text-muted); float: right; margin-top: 0.5rem;">10:24 AM</span>
+                </div>
+
+                <div style="align-self: flex-end; background: var(--accent); color: #0F172A; padding: 1rem; border-radius: var(--radius-sm); max-width: 70%;">
+                    <p style="font-size: 0.95rem;">Hello Ayse, yes it is! The room is fully furnished. Let me know if you want a tour.</p>
+                    <span style="font-size: 0.7rem; color: rgba(0,0,0,0.5); float: right; margin-top: 0.5rem;">10:28 AM</span>
+                </div>
+            </div>
+
+            <div style="padding: 1.5rem; border-top: 1px solid var(--border-color); background: var(--card-bg);">
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <input type="text" placeholder="Type a message..." style="flex: 1; padding: 1rem; border-radius: var(--radius-pill); border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-primary); font-size: 1rem; outline: none;">
+                    <button class="btn-primary" style="padding: 1rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; width: 50px; height: 50px;">
+                        <ion-icon name="send" style="font-size: 1.2rem;"></ion-icon>
+                        <div class="wave-bg"></div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homiefy | Next-Gen Roommate Matching</title>
+    <!-- Import Inter Font for modern Neative aesthetic -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script>
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar reveal">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon"><ion-icon name="home"></ion-icon></div>
+                <span>Homiefy</span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html" class="active">Listings</a>
+                <a href="my-listings.html">My Listings</a>
+                <a href="favorites.html">Favorites</a>
+                <a href="messages.html">Messages</a>
+            </div>
+            <div class="nav-actions">
+                <button id="themeToggle" class="theme-switch" aria-label="Toggle Theme">
+                    <ion-icon name="sunny" class="sun-icon"></ion-icon>
+                    <ion-icon name="moon" class="moon-icon"></ion-icon>
+                </button>
+                <a href="profile.html" class="user-profile" style="text-decoration: none;">
+                    <span>John Doe</span>
+                    <img src="https://api.dicebear.com/7.x/notionists/svg?seed=John" alt="Avatar" class="avatar">
+                </a>
+                <a href="login.html" class="view-apps-btn" style="text-decoration: none;">
+                    <ion-icon name="log-out-outline"></ion-icon>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-main neative-dark border-radius-large reveal delay-1">
+                <div class="hero-content">
+                    <div class="badge-pill light">Trusted by 2000+ roommates <ion-icon name="arrow-forward-outline"></ion-icon></div>
+                    <h1 class="ultra-title">Clean space<br>starts here</h1>
+                    <p>Find your perfect roommate and premium living spaces tailored to your needs.</p>
+                    <div class="search-bar">
+                        <ion-icon name="search-outline"></ion-icon>
+                        <input type="text" id="citySearch" placeholder="Search cities (Istanbul, Izmir...)">
+                        <button class="btn-primary" id="searchBtn">
+                            <span class="btn-text">Explore <ion-icon name="arrow-forward-outline"></ion-icon></span>
+                            <div class="wave-bg"></div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bento Stats -->
+            <div class="bento-grid">
+                <div class="bento-box bg-white border-radius-large stat-box reveal delay-2" id="categoryStatsCard">
+                    <div class="bento-header">
+                        <h3>Categories</h3>
+                        <p class="subtitle">Quick overview of available room types</p>
+                    </div>
+                    <div id="categoryStats" class="stat-list"></div>
+                </div>
+
+                <div class="bento-box neative-accent border-radius-large stat-box reveal delay-3" id="priceStatsCard">
+                    <div class="bento-header dark-text">
+                        <h3>Market Average</h3>
+                        <p class="subtitle">Average monthly rent by city</p>
+                    </div>
+                    <div id="priceStats" class="stat-list dark-text"></div>
+                    <div class="accent-decoration">
+                        <ion-icon name="trending-up-outline"></ion-icon>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dynamic Listings Section -->
+        <section class="listings-section">
+            <div class="section-header reveal">
+                <h2>Available Matches</h2>
+                <div class="filter-chip" id="listingsCount">0 found</div>
+            </div>
+            <div class="listings-grid" id="listingsGrid">
+                <!-- Cards injected here -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal Applications -->
+    <div class="modal" id="applicationModal">
+        <div class="modal-content border-radius-large">
+            <button class="close-btn" id="closeModal"><ion-icon name="close"></ion-icon></button>
+            <h2 id="modalTitle" class="modal-title">Applications</h2>
+            <div id="applicationsContainer" class="apps-list">
+                <!-- Apps injected -->
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
