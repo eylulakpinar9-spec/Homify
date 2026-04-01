@@ -523,6 +523,63 @@ window.renderMyApplications = function() {
     });
 };
 
+window.renderMyActiveListings = function() {
+    const container = document.getElementById('myActiveListingsGrid');
+    const myCount = document.getElementById('myActiveListingsCount');
+    if (!container) return;
+    
+    const listings = DB.Listings.filter(l => l.UserID === activeUserId);
+    if (myCount) myCount.innerText = `${listings.length} active room${listings.length !== 1 ? 's' : ''}`;
+    
+    if (listings.length === 0) {
+        container.innerHTML = `
+            <div style="grid-column: 1/-1; text-align: center; padding: 2rem; border: 1px dashed var(--border-color); border-radius: var(--radius-sm); color: var(--text-muted);">
+                You haven't posted any listings yet.
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = listings.map((l, index) => {
+        const delayClass = `delay-${(index % 3) + 1}`;
+        const room = DB.Rooms.find(r => r.ListingID === l.ListingID);
+        const category = DB.Categories.find(c => c.CategoryID === l.CategoryID);
+        const catName = category ? category.CategoryName : 'General';
+        const rent = room ? room.MonthlyRent : 0;
+        
+        return `
+        <div class="listing-card reveal ${delayClass}" style="position:relative;">
+            <span class="category-badge">${catName}</span>
+            <div style="position: absolute; top: 1.5rem; right: 1.5rem;">
+                <span class="status-badge status-accepted" style="font-size: 0.75rem;">Open</span>
+            </div>
+            <div style="padding-top: 1.2rem;">
+                <h3 style="padding-right: 5rem;">${l.Title}</h3>
+                <div class="card-location">
+                    <ion-icon name="location"></ion-icon> ${l.City}
+                </div>
+                <p>${l.Description.length > 80 ? l.Description.substring(0, 80) + '...' : l.Description}</p>
+            </div>
+            
+            <div class="card-foot" style="margin-top: 1rem; flex-direction: column; align-items: stretch; gap: 0.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div class="card-price">
+                        ₺${formatCurrency(rent)}<span class="month">/mo</span>
+                    </div>
+                </div>
+                <button onclick="openApplicationsModal(${l.ListingID})" class="view-apps-btn" style="width: 100%; justify-content: center; background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-primary);">
+                    <ion-icon name="people-outline"></ion-icon> View Apps
+                </button>
+            </div>
+        </div>
+        `;
+    }).join('');
+    
+    container.querySelectorAll('.listing-card').forEach(card => {
+        if (window.globalScrollObserver) window.globalScrollObserver.observe(card);
+    });
+};
+
 // --- INITIALIZATION ---
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -561,6 +618,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (activeUserId) {
         renderFavorites();
         renderMyApplications();
+        if (window.renderMyActiveListings) renderMyActiveListings();
     }
     setupModal();
 
@@ -598,7 +656,57 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
     
-
+    // Listing Creation Handling
+    const createListingForm = document.getElementById('createListingForm');
+    if (createListingForm) {
+        createListingForm.onsubmit = (e) => {
+            e.preventDefault();
+            const title = document.getElementById('listTitle').value;
+            const rent = parseInt(document.getElementById('listRent').value);
+            const city = document.getElementById('listCity').value;
+            const desc = document.getElementById('listDesc').value;
+            
+            const newListingId = Date.now() + Math.floor(Math.random() * 1000);
+            
+            DB.Listings.push({
+                ListingID: newListingId,
+                UserID: activeUserId,
+                CategoryID: 2, 
+                Title: title,
+                Description: desc,
+                City: city,
+                Address: city + ", Turkey", 
+                Status: "Open",
+                DatePosted: new Date().toISOString().split('T')[0]
+            });
+            
+            if (!DB.Rooms) DB.Rooms = [];
+            DB.Rooms.push({
+                RoomID: newListingId + 1000,
+                ListingID: newListingId,
+                RoomNumber: 1,
+                Size: 15,
+                Furnished: true,
+                MonthlyRent: rent
+            });
+            
+            // Save preferences
+            if (!DB.Preferences) DB.Preferences = [];
+            DB.Preferences.push({
+                PreferenceID: newListingId + 2000,
+                ListingID: newListingId,
+                SmokingAllowed: document.getElementById('prefSmoking')?.checked || false,
+                PetAllowed: document.getElementById('prefPets')?.checked || false,
+                GenderPreference: document.getElementById('prefGender')?.value || 'Any',
+                AgeRange: document.getElementById('prefAge')?.value || 'Any'
+            });
+            
+            saveDB();
+            createListingForm.reset();
+            alert("Listing published successfully!");
+            if (window.renderMyActiveListings) renderMyActiveListings();
+        };
+    }
     
     // Messages Handling
     const chatMessages = document.getElementById('chatMessages');

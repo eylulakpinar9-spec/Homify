@@ -74,46 +74,105 @@
                     </div>
                 </div>
 
-                <!-- Profile Preferences Form -->
-                <div class="bento-box bg-white border-radius-large">
-                    <h3 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 2rem;">Lifestyle & Preferences</h3>
-                    
-                    <form id="profileForm" style="display: flex; flex-direction: column; gap: 1.5rem;" onsubmit="event.preventDefault(); alert('Profile preferences saved!');">
-                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-                            <label style="font-weight: 600; font-size: 0.9rem;">Biography</label>
-                            <textarea id="prefBio" placeholder="Tell potential roommates about yourself..." rows="4" style="padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-primary); font-size: 1rem; outline: none; resize: vertical;"></textarea>
-                        </div>
+                <div style="display: flex; flex-direction: column; gap: 2rem;">
+                    <!-- Profile Preferences Form -->
+                    <div class="bento-box bg-white border-radius-large">
+                        <h3 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 2rem;">Lifestyle & Preferences</h3>
                         
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                        <form id="profileForm" style="display: flex; flex-direction: column; gap: 1.5rem;" onsubmit="event.preventDefault(); alert('Profile preferences saved!');">
                             <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-                                <label style="font-weight: 600; font-size: 0.9rem;">Occupation</label>
-                                <input type="text" id="prefOcc" placeholder="e.g. Software Engineer" style="padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-primary); font-size: 1rem; outline: none;">
+                                <label style="font-weight: 600; font-size: 0.9rem;">Biography</label>
+                                <textarea id="prefBio" placeholder="Tell potential roommates about yourself..." rows="4" style="padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-primary); font-size: 1rem; outline: none; resize: vertical;"></textarea>
                             </div>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                    <label style="font-weight: 600; font-size: 0.9rem;">Occupation</label>
+                                    <input type="text" id="prefOcc" placeholder="e.g. Software Engineer" style="padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-primary); font-size: 1rem; outline: none;">
+                                </div>
+                                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                    <label style="font-weight: 600; font-size: 0.9rem;">Sleep Schedule</label>
+                                    <select style="padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-primary); font-size: 1rem; outline: none;">
+                                        <option value="early">Early Bird (10 PM - 6 AM)</option>
+                                        <option value="night">Night Owl (2 AM - 10 AM)</option>
+                                        <option value="regular" selected>Regular (12 AM - 8 AM)</option>
+                                        <option value="irregular">Irregular / Shifts</option>
+                                    </select>
+                                </div>
+                            </div>
+
                             <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-                                <label style="font-weight: 600; font-size: 0.9rem;">Sleep Schedule</label>
-                                <select style="padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-primary); font-size: 1rem; outline: none;">
-                                    <option value="early">Early Bird (10 PM - 6 AM)</option>
-                                    <option value="night">Night Owl (2 AM - 10 AM)</option>
-                                    <option value="regular" selected>Regular (12 AM - 8 AM)</option>
-                                    <option value="irregular">Irregular / Shifts</option>
-                                </select>
+                                <label style="font-weight: 600; font-size: 0.9rem;">Cleanliness Level (1-5)</label>
+                                <input type="range" min="1" max="5" value="4" style="width: 100%; cursor: pointer;">
+                                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; opacity: 0.7;">
+                                    <span>1 - Relaxed</span>
+                                    <span>5 - Spotless</span>
+                                </div>
                             </div>
-                        </div>
 
-                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-                            <label style="font-weight: 600; font-size: 0.9rem;">Cleanliness Level (1-5)</label>
-                            <input type="range" min="1" max="5" value="4" style="width: 100%; cursor: pointer;">
-                            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; opacity: 0.7;">
-                                <span>1 - Relaxed</span>
-                                <span>5 - Spotless</span>
+                            <button type="submit" class="btn-primary" style="margin-top: 1rem; align-self: flex-end;">
+                                <span class="btn-text">Save Profile <ion-icon name="save-outline"></ion-icon></span>
+                                <div class="wave-bg"></div>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Create Listing Form -->
+                    <div class="bento-box bg-white border-radius-large">
+                        <h3 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 2rem;">Publish a Room Listing</h3>
+                        
+                        <form id="createListingForm" style="display: flex; flex-direction: column; gap: 1.2rem;">
+                            <input type="text" id="listTitle" placeholder="Title (e.g. Sunny Room)" required style="padding: 0.8rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-primary); font-size: 0.9rem; outline: none;">
+                            <input type="number" id="listRent" placeholder="Monthly Rent (₺)" required style="padding: 0.8rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-primary); font-size: 0.9rem; outline: none;">
+                            <input type="text" id="listCity" placeholder="City" required style="padding: 0.8rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-primary); font-size: 0.9rem; outline: none;">
+                            <textarea id="listDesc" placeholder="Description" rows="3" required style="padding: 0.8rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-primary); font-size: 0.9rem; outline: none;"></textarea>
+                            
+                            <div style="margin-top: 0.5rem; padding: 1rem; border: 1px dashed var(--border-color); border-radius: var(--radius-sm); background: var(--bg-color);">
+                                <span style="font-size: 1rem; font-weight: 700; color: var(--text-primary); display: block; margin-bottom: 0.8rem;">Roommate Preferences</span>
+                                
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                                    <label style="font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem;"><input type="checkbox" id="prefSmoking"> Smoking Allowed</label>
+                                    <label style="font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem;"><input type="checkbox" id="prefPets"> Pets Allowed</label>
+                                </div>
+
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                    <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+                                        <label style="font-size: 0.85rem; font-weight: 600;">Gender Preference</label>
+                                        <select id="prefGender" style="padding: 0.8rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: #fff; outline: none; font-size: 0.9rem;">
+                                            <option value="Any">Any</option>
+                                            <option value="Female">Female Only</option>
+                                            <option value="Male">Male Only</option>
+                                        </select>
+                                    </div>
+                                    <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+                                        <label style="font-size: 0.85rem; font-weight: 600;">Age Range</label>
+                                        <select id="prefAge" style="padding: 0.8rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: #fff; outline: none; font-size: 0.9rem;">
+                                            <option value="Any">Any</option>
+                                            <option value="18-25">18 - 25</option>
+                                            <option value="26-35">26 - 35</option>
+                                            <option value="35+">35+</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
 
-                        <button type="submit" class="btn-primary" style="margin-top: 1rem; align-self: flex-end;">
-                            <span class="btn-text">Save Profile <ion-icon name="save-outline"></ion-icon></span>
-                            <div class="wave-bg"></div>
-                        </button>
-                    </form>
+                            <button type="submit" class="btn-primary" style="margin-top: 1rem; width: 100%; justify-content: center; padding: 1rem;">
+                                <span class="btn-text">Publish Listing <ion-icon name="cloud-upload-outline"></ion-icon></span>
+                                <div class="wave-bg"></div>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- My Active Rooms Section -->
+            <div style="margin-top: 4rem;">
+                <div class="section-header">
+                    <h2>My Published Rooms</h2>
+                    <div class="filter-chip" id="myActiveListingsCount">0 active</div>
+                </div>
+                <div class="listings-grid" id="myActiveListingsGrid">
+                   <!-- Populated by app.js -->
                 </div>
             </div>
         </section>
