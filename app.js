@@ -463,45 +463,64 @@ window.renderUserProfile = function() {
     if (ageGenderInput) ageGenderInput.innerText = `Age: ${currentUser.Age || 24} | ${currentUser.Gender || 'Other'}`;
 };
 
-window.renderMyListings = function() {
-    const container = document.getElementById('myListingsGrid');
-    const myCount = document.getElementById('myListingsCount');
+window.renderMyApplications = function() {
+    const container = document.getElementById('myApplicationsGrid');
+    const myCount = document.getElementById('myApplicationsCount');
     if (!container) return;
     
-    const listings = DB.Listings.filter(l => l.UserID === activeUserId);
-    if (myCount) myCount.innerText = `${listings.length} active listing${listings.length !== 1 ? 's' : ''}`;
+    if (!DB.Applications) DB.Applications = [];
+    const myApps = DB.Applications.filter(a => a.UserID === activeUserId);
     
-    if (listings.length === 0) {
+    if (myCount) myCount.innerText = `${myApps.length} application${myApps.length !== 1 ? 's' : ''}`;
+    
+    if (myApps.length === 0) {
         container.innerHTML = `
-            <div style="padding: 2rem; border: 1px dashed var(--border-color); border-radius: var(--radius-sm); text-align: center; color: var(--text-muted);">
-                You haven't posted any listings yet. Create one from the form below!
+            <div style="grid-column: 1/-1; text-align: center; padding: 4rem 2rem; background: var(--card-bg); border-radius: var(--radius-lg); border: 1px dashed var(--border-color);">
+                <ion-icon name="document-text-outline" style="font-size: 4rem; color: var(--text-muted); margin-bottom: 1rem;"></ion-icon>
+                <h3 style="color: var(--text-primary); font-size: 1.5rem; margin-bottom: 0.5rem;">No applications yet</h3>
+                <p style="color: var(--text-muted);">You haven't applied to any rooms yet. Explore listings to find your new home.</p>
             </div>
         `;
         return;
     }
     
-    container.innerHTML = listings.map(l => {
+    container.innerHTML = myApps.map((app, index) => {
+        const l = DB.Listings.find(list => list.ListingID === app.ListingID);
+        if (!l) return '';
+        
+        const delayClass = `delay-${(index % 3) + 1}`;
         const room = DB.Rooms.find(r => r.ListingID === l.ListingID);
         const category = DB.Categories.find(c => c.CategoryID === l.CategoryID);
         const catName = category ? category.CategoryName : 'General';
         const rent = room ? room.MonthlyRent : 0;
         
         return `
-        <div style="padding: 1.5rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); display: flex; justify-content: space-between; align-items: center;">
-            <div>
-                <span class="category-badge" style="position: static; font-size: 0.7rem;">${catName}</span>
-                <h4 style="font-size: 1.2rem; font-weight: 700; margin-top: 0.5rem;">${l.Title}</h4>
-                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.3rem;"><ion-icon name="location"></ion-icon> ${l.Address || l.City}</p>
+        <div class="listing-card reveal ${delayClass}">
+            <span class="category-badge">${catName}</span>
+            <div style="position: absolute; top: 1.5rem; right: 1.5rem;">
+                <span class="status-badge status-${app.Status.toLowerCase()}" style="font-size: 0.75rem;">${app.Status}</span>
             </div>
-            <div style="text-align: right; display: flex; flex-direction: column; gap: 0.5rem;">
-                <strong style="font-size: 1.5rem;">₺${formatCurrency(rent)}<span style="font-size: 0.9rem; font-weight: 400; color: var(--text-muted);">/mo</span></strong>
-                <span class="status-badge status-accepted" style="align-self: flex-end;">Open</span>
-                <!-- Quick link to view apps on this own listing -->
-                <button onclick="openApplicationsModal(${l.ListingID})" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:0.85rem;margin-top:0.4rem;font-weight:600;"><ion-icon name="people"></ion-icon> View Apps</button>
+            <div style="padding-top: 1.2rem;">
+                <h3 style="padding-right: 5rem;">${l.Title}</h3>
+                <div class="card-location">
+                    <ion-icon name="location"></ion-icon> ${l.City}
+                </div>
+                <p>${l.Description.length > 80 ? l.Description.substring(0, 80) + '...' : l.Description}</p>
+            </div>
+            
+            <div class="card-foot" style="margin-top: 1rem;">
+                <div class="card-price">
+                    ₺${formatCurrency(rent)}<span class="month">/mo</span>
+                </div>
+                <div style="font-size: 0.8rem; color: var(--text-muted);">Applied: ${app.ApplicationDate}</div>
             </div>
         </div>
         `;
     }).join('');
+    
+    container.querySelectorAll('.listing-card').forEach(card => {
+        if (window.globalScrollObserver) window.globalScrollObserver.observe(card);
+    });
 };
 
 // --- INITIALIZATION ---
@@ -541,7 +560,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderListings();
     if (activeUserId) {
         renderFavorites();
-        renderMyListings();
+        renderMyApplications();
     }
     setupModal();
 
@@ -579,47 +598,59 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
     
-    // Listing Creation Handling
-    const createListingForm = document.getElementById('createListingForm');
-    if (createListingForm) {
-        createListingForm.onsubmit = (e) => {
-            e.preventDefault();
-            const title = document.getElementById('listTitle').value;
-            const rent = parseInt(document.getElementById('listRent').value);
-            const city = document.getElementById('listCity').value;
-            const desc = document.getElementById('listDesc').value;
-            
-            const newListingId = Date.now() + Math.floor(Math.random() * 1000);
-            
-            DB.Listings.push({
-                ListingID: newListingId,
-                UserID: activeUserId,
-                CategoryID: 2, // Defaulting to Young Professionals for mock
-                Title: title,
-                Description: desc,
-                City: city,
-                Address: city + ", Turkey", // mock address
-                Status: "Open",
-                DatePosted: new Date().toISOString().split('T')[0]
-            });
-            
-            if (!DB.Rooms) DB.Rooms = [];
-            DB.Rooms.push({
-                RoomID: newListingId + 1000,
-                ListingID: newListingId,
-                RoomNumber: 1,
-                Size: 15,
-                Furnished: true,
-                MonthlyRent: rent
-            });
-            
-            saveDB();
-            createListingForm.reset();
-            alert("Listing published successfully!");
-            renderMyListings();
-        };
-    }
+
     
+    // Messages Handling
+    const chatMessages = document.getElementById('chatMessages');
+    const messageInput = document.getElementById('messageInput');
+    const sendMsgBtn = document.getElementById('sendMsgBtn');
+
+    if (chatMessages && messageInput && sendMsgBtn) {
+        if (!DB.Messages) DB.Messages = [];
+        
+        function renderMessages() {
+            DB.Messages.forEach(msg => {
+                const msgEl = document.createElement('div');
+                msgEl.style.cssText = "align-self: flex-end; background: var(--accent); color: #0F172A; padding: 1rem; border-radius: var(--radius-sm); max-width: 70%;";
+                msgEl.innerHTML = `
+                    <p style="font-size: 0.95rem;">${msg.text}</p>
+                    <span style="font-size: 0.7rem; color: rgba(0,0,0,0.5); float: right; margin-top: 0.5rem;">${msg.time}</span>
+                `;
+                chatMessages.appendChild(msgEl);
+            });
+            setTimeout(() => chatMessages.scrollTop = chatMessages.scrollHeight, 50);
+        }
+        
+        renderMessages();
+
+        function sendMessage() {
+            const text = messageInput.value.trim();
+            if (text) {
+                const date = new Date();
+                const time = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                
+                const msg = { text, time };
+                DB.Messages.push(msg);
+                saveDB();
+                
+                const msgEl = document.createElement('div');
+                msgEl.style.cssText = "align-self: flex-end; background: var(--accent); color: #0F172A; padding: 1rem; border-radius: var(--radius-sm); max-width: 70%;";
+                msgEl.innerHTML = `
+                    <p style="font-size: 0.95rem;">${text}</p>
+                    <span style="font-size: 0.7rem; color: rgba(0,0,0,0.5); float: right; margin-top: 0.5rem;">${time}</span>
+                `;
+                chatMessages.appendChild(msgEl);
+                messageInput.value = '';
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+        }
+
+        sendMsgBtn.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+    }
+
     // Login Handling
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
