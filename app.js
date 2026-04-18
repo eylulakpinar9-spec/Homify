@@ -7,10 +7,16 @@ const DEFAULT_DB = {
         { CategoryID: 3, CategoryName: "Mixed Shared", TargetGroup: "Anyone" }
     ],
     Users: [
-        { UserID: 1, Name: "Atakan Ünal", Email: "atakan@example.com", Bio: "I love coding and quiet spaces.", Age: 25, Gender: "Male", Cleanliness: 4, Occupation: "Student" },
-        { UserID: 2, Name: "Mehmet Kaya", Email: "mehmet@example.com", Bio: "IT professional. Early bird.", Age: 28, Gender: "Male", Cleanliness: 5, Occupation: "Engineer" },
-        { UserID: 3, Name: "Eylül Akpınar", Email: "eylül@example.com", Bio: "Art student. Night owl but very respectful.", Age: 22, Gender: "Female", Cleanliness: 3, Occupation: "Student" },
-        { UserID: 4, Name: "İrem Aköz", Email: "irem@example.com", Bio: "Medical resident. Rarely at home.", Age: 26, Gender: "Female", Cleanliness: 5, Occupation: "Doctor" }
+        { UserID: 1, Name: "Atakan Ünal", Email: "atakan@example.com", PhoneNumber: "5551234567", RegistrationDate: "2026-01-10", Age: 25, Gender: "Male" },
+        { UserID: 2, Name: "Mehmet Kaya", Email: "mehmet@example.com", PhoneNumber: "5559876543", RegistrationDate: "2026-01-15", Age: 28, Gender: "Male" },
+        { UserID: 3, Name: "Eylül Akpınar", Email: "eylül@example.com", PhoneNumber: "5554567890", RegistrationDate: "2026-02-05", Age: 22, Gender: "Female" },
+        { UserID: 4, Name: "İrem Aköz", Email: "irem@example.com", PhoneNumber: "5557890123", RegistrationDate: "2026-02-20", Age: 26, Gender: "Female" }
+    ],
+    Profiles: [
+        { ProfileID: 1001, UserID: 1, Biography: "I love coding and quiet spaces.", Occupation: "Student", CleanlinessLevel: 4, SleepSchedule: "Regular" },
+        { ProfileID: 1002, UserID: 2, Biography: "IT professional. Early bird.", Occupation: "Engineer", CleanlinessLevel: 5, SleepSchedule: "Early Bird" },
+        { ProfileID: 1003, UserID: 3, Biography: "Art student. Night owl but very respectful.", Occupation: "Student", CleanlinessLevel: 3, SleepSchedule: "Night Owl" },
+        { ProfileID: 1004, UserID: 4, Biography: "Medical resident. Rarely at home.", Occupation: "Doctor", CleanlinessLevel: 5, SleepSchedule: "Irregular" }
     ],
     Listings: [
         { ListingID: 101, UserID: 1, CategoryID: 1, Title: "Sunny Room near Campus", Description: "Great for students, just a 5-minute walk to the main university campus. Fast Wi-Fi and utilities included.", City: "Istanbul", Address: "Besiktas, Istanbul", Status: "Open", DatePosted: "2026-03-20" },
@@ -27,12 +33,26 @@ const DEFAULT_DB = {
         { RoomID: 205, ListingID: 105, RoomNumber: 3, Size: 18, Furnished: true, MonthlyRent: 12500 }
     ],
     Applications: [
-        { ApplicationID: 301, UserID: 2, ListingID: 101, ApplicationDate: "2026-03-21", Status: "Pending" },
-        { ApplicationID: 302, UserID: 3, ListingID: 101, ApplicationDate: "2026-03-22", Status: "Accepted" },
-        { ApplicationID: 303, UserID: 1, ListingID: 102, ApplicationDate: "2026-03-23", Status: "Pending" }
+        { ApplicationID: 301, UserID: 2, RoomID: 201, ApplicationDate: "2026-03-21", Status: "Pending" },
+        { ApplicationID: 302, UserID: 3, RoomID: 201, ApplicationDate: "2026-03-22", Status: "Accepted" },
+        { ApplicationID: 303, UserID: 1, RoomID: 202, ApplicationDate: "2026-03-23", Status: "Pending" }
+    ],
+    Payments: [
+        { PaymentID: 401, ApplicationID: 302, Amount: 8500, PaymentDate: "2026-03-23" }
     ],
     Favorites: [
-        { UserID: 2, ListingID: 102 }
+        { FavoriteID: 501, UserID: 2, ListingID: 102, DateSaved: "2026-04-01" }
+    ],
+    Preferences: [
+        { PreferenceID: 2001, ListingID: 101, SmokingAllowed: false, PetAllowed: true, GenderPreference: "Any", AgeRange: "18-25", OtherNotes: "Looking for friendly vibes" },
+        { PreferenceID: 2002, ListingID: 102, SmokingAllowed: false, PetAllowed: false, GenderPreference: "Male", AgeRange: "26-35", OtherNotes: "Professional only" },
+        { PreferenceID: 2003, ListingID: 103, SmokingAllowed: false, PetAllowed: false, GenderPreference: "Female", AgeRange: "18-25", OtherNotes: "Quiet is a must" },
+        { PreferenceID: 2004, ListingID: 104, SmokingAllowed: true, PetAllowed: false, GenderPreference: "Female", AgeRange: "26-35", OtherNotes: "" },
+        { PreferenceID: 2005, ListingID: 105, SmokingAllowed: true, PetAllowed: true, GenderPreference: "Any", AgeRange: "Any", OtherNotes: "Open minded" }
+    ],
+    Messages: [
+        { MessageID: 601, SenderUserID: 2, ReceiverUserID: 1, Content: "Hey, is the room still available?", Timestamp: "2026-03-21 14:00" },
+        { MessageID: 602, SenderUserID: 1, ReceiverUserID: 2, Content: "Yes, it is! When can you view it?", Timestamp: "2026-03-21 15:30" }
     ]
 };
 
@@ -41,6 +61,11 @@ try {
     const savedDB = localStorage.getItem('HomiefyDB');
     if (savedDB) {
         DB = JSON.parse(savedDB);
+        // Schema migrations
+        if (!DB.Profiles) DB.Profiles = DEFAULT_DB.Profiles;
+        if (!DB.Payments) DB.Payments = DEFAULT_DB.Payments;
+        if (!DB.Messages) DB.Messages = DEFAULT_DB.Messages;
+        localStorage.setItem('HomiefyDB', JSON.stringify(DB));
     } else {
         DB = DEFAULT_DB;
         localStorage.setItem('HomiefyDB', JSON.stringify(DB));
@@ -66,7 +91,7 @@ window.toggleFavorite = function(listingId) {
     if (index > -1) {
         DB.Favorites.splice(index, 1);
     } else {
-        DB.Favorites.push({ UserID: activeUserId, ListingID: listingId });
+        DB.Favorites.push({ FavoriteID: Date.now(), UserID: activeUserId, ListingID: listingId, DateSaved: new Date().toISOString().split('T')[0] });
     }
     
     saveDB();
@@ -81,7 +106,12 @@ window.applyToListing = function(listingId) {
         return;
     }
     if (!DB.Applications) DB.Applications = [];
-    const alreadyApplied = DB.Applications.some(a => a.UserID === activeUserId && a.ListingID === listingId);
+    const room = DB.Rooms.find(r => r.ListingID === listingId);
+    if (!room) {
+        alert("This listing has no rooms available.");
+        return;
+    }
+    const alreadyApplied = DB.Applications.some(a => a.UserID === activeUserId && a.RoomID === room.RoomID);
     
     if (alreadyApplied) {
         alert("You have already applied to this listing!");
@@ -91,7 +121,7 @@ window.applyToListing = function(listingId) {
     DB.Applications.push({
         ApplicationID: Date.now(),
         UserID: activeUserId,
-        ListingID: listingId,
+        RoomID: room.RoomID,
         ApplicationDate: new Date().toISOString().split('T')[0],
         Status: "Pending"
     });
@@ -150,7 +180,7 @@ function getAveragePricesByCity() {
     })).sort((a, b) => b.averagePrice - a.averagePrice);
 }
 
-function getListingsByCity(cityQuery) {
+function getFilteredListings(cityQuery = "") {
     let matchedListings = DB.Listings;
 
     if (cityQuery && cityQuery.trim() !== '') {
@@ -158,10 +188,24 @@ function getListingsByCity(cityQuery) {
         matchedListings = DB.Listings.filter(l => l.City.toLowerCase().includes(queryTerm));
     }
 
-    return matchedListings.map(listing => {
+    // Apply main feed filters if elements exist
+    const catFilter = document.getElementById('filterCategory');
+    const rentFilter = document.getElementById('filterRent');
+    const matchFilter = document.getElementById('filterMatchOnly');
+    const petsFilter = document.getElementById('filterPets');
+    const smokingFilter = document.getElementById('filterSmoking');
+    const activeUser = DB.Users.find(u => u.UserID === activeUserId);
+    
+    // Process Advanced Filters
+    if (catFilter && catFilter.value !== 'All') {
+        matchedListings = matchedListings.filter(l => l.CategoryID === parseInt(catFilter.value));
+    }
+    
+    // We map early to get Rent for filtering
+    let processedListings = matchedListings.map(listing => {
         const room = DB.Rooms.find(r => r.ListingID === listing.ListingID);
         const category = DB.Categories.find(c => c.CategoryID === listing.CategoryID);
-
+        
         return {
             ...listing,
             MonthlyRent: room ? room.MonthlyRent : 0,
@@ -169,11 +213,50 @@ function getListingsByCity(cityQuery) {
             CategoryName: category ? category.CategoryName : "Undefined"
         };
     });
+
+    if (rentFilter && rentFilter.value.trim() !== '') {
+        const maxRent = parseInt(rentFilter.value);
+        processedListings = processedListings.filter(l => l.MonthlyRent <= maxRent);
+    }
+    
+    if (petsFilter && petsFilter.checked) {
+        processedListings = processedListings.filter(l => {
+            const pref = DB.Preferences.find(p => p.ListingID === l.ListingID);
+            return pref && pref.PetAllowed;
+        });
+    }
+
+    if (smokingFilter && smokingFilter.checked) {
+        processedListings = processedListings.filter(l => {
+            const pref = DB.Preferences.find(p => p.ListingID === l.ListingID);
+            return pref && pref.SmokingAllowed;
+        });
+    }
+
+    if (matchFilter && matchFilter.checked && activeUser && DB.Preferences) {
+        processedListings = processedListings.filter(l => {
+            const pref = DB.Preferences.find(p => p.ListingID === l.ListingID);
+            if (!pref) return false;
+            let isMatch = true;
+            if (pref.GenderPreference !== "Any" && pref.GenderPreference !== activeUser.Gender) isMatch = false;
+            if (pref.AgeRange !== "Any" && activeUser.Age) {
+                if (pref.AgeRange === "18-25" && (activeUser.Age < 18 || activeUser.Age > 25)) isMatch = false;
+                if (pref.AgeRange === "26-35" && (activeUser.Age < 26 || activeUser.Age > 35)) isMatch = false;
+                if (pref.AgeRange === "35+" && activeUser.Age <= 35) isMatch = false;
+            }
+            return isMatch;
+        });
+    }
+
+    return processedListings;
 }
 
 function getApplicationsForListing(listingId) {
+    const room = DB.Rooms.find(r => r.ListingID === listingId);
+    if (!room) return [];
+    
     return DB.Applications
-        .filter(app => app.ListingID === listingId)
+        .filter(app => app.RoomID === room.RoomID)
         .map(app => {
             const user = DB.Users.find(u => u.UserID === app.UserID);
             return {
@@ -216,7 +299,7 @@ function renderStats() {
 }
 
 function renderListings(cityFilter = "") {
-    const listings = getListingsByCity(cityFilter);
+    const listings = getFilteredListings(cityFilter);
     const container = document.getElementById('listingsGrid');
     const countEl = document.getElementById('listingsCount');
 
@@ -240,27 +323,47 @@ function renderListings(cityFilter = "") {
         const heartColor = isFav ? 'var(--accent)' : 'var(--text-muted)';
         const heartType = isFav ? 'heart' : 'heart-outline';
         
+        let matchBadge = '';
+        const matchFilter = document.getElementById('filterMatchOnly');
+        if (matchFilter && matchFilter.checked && activeUserId && DB.Preferences) {
+            const pref = DB.Preferences.find(p => p.ListingID === l.ListingID);
+            const activeUser = DB.Users.find(u => u.UserID === activeUserId);
+            if (pref && activeUser) {
+                let isMatch = true;
+                if (pref.GenderPreference !== "Any" && pref.GenderPreference !== activeUser.Gender) isMatch = false;
+                if (pref.AgeRange !== "Any" && activeUser.Age) {
+                    if (pref.AgeRange === "18-25" && (activeUser.Age < 18 || activeUser.Age > 25)) isMatch = false;
+                    if (pref.AgeRange === "26-35" && (activeUser.Age < 26 || activeUser.Age > 35)) isMatch = false;
+                    if (pref.AgeRange === "35+" && activeUser.Age <= 35) isMatch = false;
+                }
+                if (isMatch) {
+                    matchBadge = `<div style="position:absolute; top: -10px; left: -10px; background: var(--accent); color: #0F172A; padding: 0.3rem 0.6rem; border-radius: var(--radius-sm); font-size: 0.75rem; font-weight: 800; display: flex; align-items: center; gap: 0.2rem; transform: rotate(-5deg); box-shadow: 0 4px 10px rgba(228,255,0,0.3); z-index: 10;"><ion-icon name="flash"></ion-icon> Match!</div>`;
+                }
+            }
+        }
+        
         return `
-        <div class="listing-card reveal ${delayClass}" data-id="${l.ListingID}">
+        <div class="listing-card reveal ${delayClass}" data-id="${l.ListingID}" style="position: relative;">
+            ${matchBadge}
             <span class="category-badge">${l.CategoryName}</span>
-            <div style="position: absolute; top: 1.5rem; right: 1.5rem; font-size: 1.5rem; color: ${heartColor}; cursor: pointer; transition: color 0.2s;" onclick="toggleFavorite(${l.ListingID})">
+            <div style="position: absolute; top: 1.5rem; right: 1.5rem; font-size: 1.5rem; color: ${heartColor}; cursor: pointer; transition: color 0.2s; z-index: 5;" onclick="toggleFavorite(${l.ListingID})">
                 <ion-icon name="${heartType}"></ion-icon>
             </div>
-            <div style="padding-top: 1.2rem;">
+            <div style="padding-top: 1.2rem; cursor: pointer;" onclick="openListingDetails(${l.ListingID})">
                 <h3 style="padding-right: 3rem;">${l.Title}</h3>
                 <div class="card-location">
                     <ion-icon name="location"></ion-icon> ${l.City}
                 </div>
                 <p>${l.Description.length > 80 ? l.Description.substring(0, 80) + '...' : l.Description}</p>
+                <div style="margin-top:0.8rem; font-size:0.85rem; font-weight:600; color: var(--accent);"><ion-icon name="eye-outline" style="vertical-align:-2px; padding-right:2px;"></ion-icon> View matches & details</div>
             </div>
             
-            <div class="card-foot">
+            <div class="card-foot" style="position: relative; z-index: 5;">
                 <div class="card-price">
                     ₺${formatCurrency(l.MonthlyRent)}<span class="month">/mo</span>
                 </div>
-                <!-- Applying logic wrapper -->
-                <button class="view-apps-btn" onclick="applyToListing(${l.ListingID})">
-                    <ion-icon name="paper-plane-outline"></ion-icon> Apply
+                <button class="btn-primary" style="padding: 0.6rem 1rem;" onclick="applyToListing(${l.ListingID})">
+                    <span class="btn-text">Apply</span>
                 </button>
             </div>
         </div>
@@ -297,6 +400,67 @@ function setupModal() {
         }
     });
 }
+
+window.openListingDetails = function(listingId) {
+    const modal = document.getElementById('listingDetailModal');
+    if (!modal) return;
+    
+    const listing = DB.Listings.find(l => l.ListingID === listingId);
+    const room = DB.Rooms.find(r => r.ListingID === listingId);
+    const hostUser = DB.Users.find(u => u.UserID === listing.UserID);
+    const hostProfile = DB.Profiles ? DB.Profiles.find(p => p.UserID === listing.UserID) : null;
+    const host = { ...hostUser, ...(hostProfile || {}) };
+    const category = DB.Categories.find(c => c.CategoryID === listing.CategoryID);
+    
+    // Listing -> Preference is 1:N, we pick the first one for display
+    const prefs = (DB.Preferences || []).find(p => p.ListingID === listingId) || { SmokingAllowed: false, PetAllowed: false, GenderPreference: 'Any', AgeRange: 'Any' };
+    
+    if (!listing || !hostUser) return;
+
+    // Room Info
+    document.getElementById('detailCategory').innerText = category ? category.CategoryName : 'General';
+    document.getElementById('detailTitle').innerText = listing.Title;
+    document.getElementById('detailLocation').innerHTML = `<ion-icon name="location"></ion-icon> ${listing.City}`;
+    document.getElementById('detailPrice').innerHTML = `₺${formatCurrency(room ? room.MonthlyRent : 0)}<span class="month" style="font-size: 0.9rem; font-weight: 500; opacity: 0.7;">/mo</span>`;
+    document.getElementById('detailDesc').innerText = listing.Description;
+    document.getElementById('detailSize').innerHTML = `<ion-icon name="expand-outline"></ion-icon> <span>${room ? room.Size : 0} m²</span>`;
+    document.getElementById('detailFurnished').innerHTML = `<ion-icon name="bed-outline"></ion-icon> <span>${(room && room.Furnished) ? 'Furnished' : 'Unfurnished'}</span>`;
+    
+    // Host Info
+    document.getElementById('detailHostAvatar').src = "https://api.dicebear.com/7.x/notionists/svg?seed=" + (host.Name || "").replace(/\s+/g,'');
+    document.getElementById('detailHostName').innerText = host.Name;
+    document.getElementById('detailHostBio').innerText = host.Biography || "No bio available.";
+    document.getElementById('detailHostAgeGender').innerText = `${host.Age || 24} | ${host.Gender || 'Other'}`;
+    document.getElementById('detailHostJob').innerText = host.Occupation || "Student";
+    document.getElementById('detailHostCleanliness').innerText = `Cleanliness: ${host.CleanlinessLevel || 3}/5`;
+    
+    // Preferences Grid
+    const prefGrid = document.getElementById('detailPreferencesGrid');
+    prefGrid.innerHTML = `
+        <div style="background: var(--bg-color); padding: 0.8rem; border-radius: var(--radius-sm); display: flex; align-items: center; gap: 0.5rem; border: 1px solid var(--border-color);">
+            <ion-icon name="${prefs.SmokingAllowed ? 'checkmark-circle' : 'close-circle'}" style="color: ${prefs.SmokingAllowed ? 'var(--accent)' : 'var(--text-muted)'}; font-size: 1.2rem;"></ion-icon>
+            <span style="font-size: 0.9rem; font-weight: 500;">Smoking: ${prefs.SmokingAllowed ? 'Allowed' : 'No'}</span>
+        </div>
+        <div style="background: var(--bg-color); padding: 0.8rem; border-radius: var(--radius-sm); display: flex; align-items: center; gap: 0.5rem; border: 1px solid var(--border-color);">
+            <ion-icon name="${prefs.PetAllowed ? 'checkmark-circle' : 'close-circle'}" style="color: ${prefs.PetAllowed ? 'var(--accent)' : 'var(--text-muted)'}; font-size: 1.2rem;"></ion-icon>
+            <span style="font-size: 0.9rem; font-weight: 500;">Pets: ${prefs.PetAllowed ? 'Allowed' : 'No'}</span>
+        </div>
+        <div style="background: var(--bg-color); padding: 0.8rem; border-radius: var(--radius-sm); display: flex; align-items: center; gap: 0.5rem; border: 1px solid var(--border-color);">
+            <ion-icon name="male-female-outline" style="color: var(--text-primary); font-size: 1.2rem;"></ion-icon>
+            <span style="font-size: 0.9rem; font-weight: 500;">Gender: ${prefs.GenderPreference}</span>
+        </div>
+        <div style="background: var(--bg-color); padding: 0.8rem; border-radius: var(--radius-sm); display: flex; align-items: center; gap: 0.5rem; border: 1px solid var(--border-color);">
+            <ion-icon name="calendar-outline" style="color: var(--text-primary); font-size: 1.2rem;"></ion-icon>
+            <span style="font-size: 0.9rem; font-weight: 500;">Age: ${prefs.AgeRange}</span>
+        </div>
+    `;
+    
+    // Setup Apply Button
+    const applyBtn = document.getElementById('detailApplyBtn');
+    applyBtn.onclick = () => { applyToListing(listingId); modal.classList.remove('visible'); };
+    
+    modal.classList.add('visible');
+};
 
 window.openApplicationsModal = function (listingId) {
     const apps = getApplicationsForListing(listingId);
@@ -442,25 +606,27 @@ window.renderUserProfile = function() {
     const userDisplays = document.querySelectorAll('.user-profile span');
     const userUserImages = document.querySelectorAll('.user-profile img');
     const currentUser = DB.Users.find(u => u.UserID === activeUserId);
+    const currentProfile = DB.Profiles ? DB.Profiles.find(p => p.UserID === activeUserId) : null;
+    const combinedUser = { ...currentUser, ...(currentProfile || {}) };
     if (!currentUser) return;
     
-    userDisplays.forEach(el => { el.innerText = currentUser.Name; });
-    userUserImages.forEach(el => { el.src = "https://api.dicebear.com/7.x/notionists/svg?seed=" + currentUser.Name.replace(/\s+/g,''); });
+    userDisplays.forEach(el => { el.innerText = combinedUser.Name; });
+    userUserImages.forEach(el => { el.src = "https://api.dicebear.com/7.x/notionists/svg?seed=" + combinedUser.Name.replace(/\s+/g,''); });
     
     // Inject into profile.html inputs
     const profileName = document.getElementById('profileName');
-    if (profileName) profileName.innerText = currentUser.Name;
+    if (profileName) profileName.innerText = combinedUser.Name;
     const profileEmail = document.getElementById('profileEmail');
-    if (profileEmail) profileEmail.innerText = currentUser.Email;
+    if (profileEmail) profileEmail.innerText = combinedUser.Email;
     
     const bioInput = document.getElementById('prefBio');
-    if (bioInput && currentUser.Bio) bioInput.value = currentUser.Bio;
+    if (bioInput && combinedUser.Biography) bioInput.value = combinedUser.Biography;
     
     const occInput = document.getElementById('prefOcc');
-    if (occInput && currentUser.Occupation) occInput.value = currentUser.Occupation;
+    if (occInput && combinedUser.Occupation) occInput.value = combinedUser.Occupation;
     
     const ageGenderInput = document.getElementById('profileAgeGender');
-    if (ageGenderInput) ageGenderInput.innerText = `Age: ${currentUser.Age || 24} | ${currentUser.Gender || 'Other'}`;
+    if (ageGenderInput) ageGenderInput.innerText = `Age: ${combinedUser.Age || 24} | ${combinedUser.Gender || 'Other'}`;
 };
 
 window.renderMyApplications = function() {
@@ -485,11 +651,11 @@ window.renderMyApplications = function() {
     }
     
     container.innerHTML = myApps.map((app, index) => {
-        const l = DB.Listings.find(list => list.ListingID === app.ListingID);
+        const room = DB.Rooms.find(r => r.RoomID === app.RoomID);
+        const l = room ? DB.Listings.find(list => list.ListingID === room.ListingID) : null;
         if (!l) return '';
         
         const delayClass = `delay-${(index % 3) + 1}`;
-        const room = DB.Rooms.find(r => r.ListingID === l.ListingID);
         const category = DB.Categories.find(c => c.CategoryID === l.CategoryID);
         const catName = category ? category.CategoryName : 'General';
         const rent = room ? room.MonthlyRent : 0;
@@ -625,6 +791,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Events for Search / Filtering
     const searchBtn = document.getElementById('searchBtn');
     const searchInput = document.getElementById('citySearch');
+    const applyFiltersBtn = document.getElementById('applyFiltersBtn');
 
     if (searchBtn && searchInput) {
         searchBtn.addEventListener('click', () => {
@@ -638,6 +805,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
+    if (applyFiltersBtn) {
+        applyFiltersBtn.addEventListener('click', () => {
+             renderListings(searchInput ? searchInput.value : "");
+        });
+    }
+    
     // Profile Update Handling
     const profileForm = document.getElementById('profileForm');
     if (profileForm) {
@@ -647,8 +820,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const occ = document.getElementById('prefOcc')?.value;
             const userIndex = DB.Users.findIndex(u => u.UserID === activeUserId);
             if (userIndex > -1) {
-                DB.Users[userIndex].Bio = bio;
-                DB.Users[userIndex].Occupation = occ;
+                if (!DB.Profiles) DB.Profiles = [];
+                let profileIndex = DB.Profiles.findIndex(p => p.UserID === activeUserId);
+                if (profileIndex === -1) {
+                    DB.Profiles.push({ ProfileID: Date.now(), UserID: activeUserId });
+                    profileIndex = DB.Profiles.length - 1;
+                }
+                DB.Profiles[profileIndex].Biography = bio;
+                DB.Profiles[profileIndex].Occupation = occ;
                 saveDB();
                 alert("Profile preferences saved!");
                 renderUserProfile();
@@ -698,7 +877,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 SmokingAllowed: document.getElementById('prefSmoking')?.checked || false,
                 PetAllowed: document.getElementById('prefPets')?.checked || false,
                 GenderPreference: document.getElementById('prefGender')?.value || 'Any',
-                AgeRange: document.getElementById('prefAge')?.value || 'Any'
+                AgeRange: document.getElementById('prefAge')?.value || 'Any',
+                OtherNotes: ""
             });
             
             saveDB();
@@ -717,12 +897,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!DB.Messages) DB.Messages = [];
         
         function renderMessages() {
+            chatMessages.innerHTML = '';
             DB.Messages.forEach(msg => {
+                const isMine = msg.SenderUserID === activeUserId;
                 const msgEl = document.createElement('div');
-                msgEl.style.cssText = "align-self: flex-end; background: var(--accent); color: #0F172A; padding: 1rem; border-radius: var(--radius-sm); max-width: 70%;";
+                msgEl.style.cssText = isMine 
+                    ? "align-self: flex-end; background: var(--accent); color: #0F172A; padding: 1rem; border-radius: var(--radius-sm); max-width: 70%; margin-bottom: 0.5rem;"
+                    : "align-self: flex-start; background: var(--card-bg); color: var(--text-primary); border: 1px solid var(--border-color); padding: 1rem; border-radius: var(--radius-sm); max-width: 70%; margin-bottom: 0.5rem;";
                 msgEl.innerHTML = `
-                    <p style="font-size: 0.95rem;">${msg.text}</p>
-                    <span style="font-size: 0.7rem; color: rgba(0,0,0,0.5); float: right; margin-top: 0.5rem;">${msg.time}</span>
+                    <p style="font-size: 0.95rem;">${msg.Content}</p>
+                    <span style="font-size: 0.7rem; color: rgba(0,0,0,0.5); float: ${isMine ? 'right' : 'left'}; margin-top: 0.5rem;">${msg.Timestamp}</span>
                 `;
                 chatMessages.appendChild(msgEl);
             });
@@ -736,20 +920,20 @@ document.addEventListener('DOMContentLoaded', () => {
             if (text) {
                 const date = new Date();
                 const time = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const timestamp = date.toISOString().split('T')[0] + " " + time;
                 
-                const msg = { text, time };
+                const msg = {
+                    MessageID: Date.now(),
+                    SenderUserID: activeUserId || 0,
+                    ReceiverUserID: 1, // Mock receiver
+                    Content: text,
+                    Timestamp: timestamp
+                };
                 DB.Messages.push(msg);
                 saveDB();
                 
-                const msgEl = document.createElement('div');
-                msgEl.style.cssText = "align-self: flex-end; background: var(--accent); color: #0F172A; padding: 1rem; border-radius: var(--radius-sm); max-width: 70%;";
-                msgEl.innerHTML = `
-                    <p style="font-size: 0.95rem;">${text}</p>
-                    <span style="font-size: 0.7rem; color: rgba(0,0,0,0.5); float: right; margin-top: 0.5rem;">${time}</span>
-                `;
-                chatMessages.appendChild(msgEl);
+                renderMessages();
                 messageInput.value = '';
-                chatMessages.scrollTop = chatMessages.scrollHeight;
             }
         }
 
@@ -774,17 +958,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.location.href = "index.html";
             } else {
                 // If not found, log them in as a generic new user anyway for mock purposes
+                const parsedId = Date.now();
                 const newUser = {
-                    UserID: Date.now(),
+                    UserID: parsedId,
                     Name: email.split('@')[0],
                     Email: email,
-                    Bio: "",
+                    PhoneNumber: "",
+                    RegistrationDate: new Date().toISOString().split('T')[0],
                     Age: 25,
-                    Gender: "Other",
-                    Cleanliness: 3,
-                    Occupation: "Student"
+                    Gender: "Other"
+                };
+                const newProfile = {
+                    ProfileID: parsedId + 1,
+                    UserID: parsedId,
+                    Biography: "",
+                    Occupation: "Student",
+                    CleanlinessLevel: 3,
+                    SleepSchedule: "Regular"
                 };
                 DB.Users.push(newUser);
+                if (!DB.Profiles) DB.Profiles = [];
+                DB.Profiles.push(newProfile);
                 saveDB();
                 try {
                     localStorage.setItem('activeUserId', newUser.UserID);

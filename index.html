@@ -97,6 +97,38 @@
                 <h2>Available Matches</h2>
                 <div class="filter-chip" id="listingsCount">0 found</div>
             </div>
+            
+            <!-- Filters Bar -->
+            <div class="reveal delay-1" style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; margin-bottom: 2rem; background: var(--card-bg); padding: 1rem 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                <div style="font-weight: 700; color: var(--text-primary); margin-right: 1rem;"><ion-icon name="options-outline" style="vertical-align:-2px; margin-right:4px;"></ion-icon> Filter</div>
+                
+                <select id="filterCategory" style="padding: 0.6rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-primary); font-size: 0.9rem; outline: none; min-width: 150px;">
+                    <option value="All">All Categories</option>
+                    <option value="1">Student Housing</option>
+                    <option value="2">Young Professionals</option>
+                    <option value="3">Mixed Shared</option>
+                </select>
+
+                <input type="number" id="filterRent" placeholder="Max Rent (₺)" style="padding: 0.6rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-primary); font-size: 0.9rem; outline: none; width: 150px;">
+                
+                <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: var(--text-primary); cursor: pointer; user-select: none;">
+                    <input type="checkbox" id="filterPets" style="width: 16px; height: 16px;"> Pet Friendly
+                </label>
+
+                <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: var(--text-primary); cursor: pointer; user-select: none;">
+                    <input type="checkbox" id="filterSmoking" style="width: 16px; height: 16px;"> Smoking Allowed
+                </label>
+
+                <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: var(--text-primary); cursor: pointer; user-select: none; margin-left: auto;">
+                    <input type="checkbox" id="filterMatchOnly" style="accent-color: var(--accent); width: 16px; height: 16px;">
+                    <b style="color:var(--accent);">Match My Profile</b>
+                </label>
+                
+                <button id="applyFiltersBtn" class="btn-primary" style="padding: 0.6rem 1.5rem;">
+                    <span class="btn-text">Apply</span>
+                </button>
+            </div>
+
             <div class="listings-grid" id="listingsGrid">
                 <!-- Cards injected here -->
             </div>
@@ -110,6 +142,72 @@
             <h2 id="modalTitle" class="modal-title">Applications</h2>
             <div id="applicationsContainer" class="apps-list">
                 <!-- Apps injected -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Listing Details -->
+    <div class="modal" id="listingDetailModal">
+        <div class="modal-content border-radius-large" style="max-width: 600px; max-height: 85vh; overflow-y: auto;">
+            <button class="close-btn" id="closeDetailModal" onclick="document.getElementById('listingDetailModal').classList.remove('visible')"><ion-icon name="close"></ion-icon></button>
+            
+            <!-- Hero Image / Room Info -->
+            <div style="background: var(--card-bg); border-radius: var(--radius-md); padding: 1.5rem; margin-top: 1rem; border: 1px dashed var(--border-color);">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                    <div>
+                        <span id="detailCategory" class="category-badge" style="position: static; margin-bottom: 0.5rem; display: inline-block;">Category</span>
+                        <h2 id="detailTitle" style="font-size: 1.5rem; font-weight: 800; color: var(--text-primary); margin-top: 0.5rem;">Room Title</h2>
+                        <div id="detailLocation" class="card-location" style="margin-top: 0.4rem; font-size: 0.95rem;">
+                            <ion-icon name="location"></ion-icon> City
+                        </div>
+                    </div>
+                    <div id="detailPrice" style="font-size: 1.4rem; font-weight: 800; color: var(--text-primary);">
+                        ₺0<span class="month" style="font-size: 0.9rem; font-weight: 500; opacity: 0.7;">/mo</span>
+                    </div>
+                </div>
+                <p id="detailDesc" style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.5rem; word-break: break-word;">Description goes here...</p>
+                <div style="display: flex; gap: 1rem;">
+                    <div class="badge-pill light" id="detailSize"><ion-icon name="expand-outline"></ion-icon> <span>0 m²</span></div>
+                    <div class="badge-pill light" id="detailFurnished"><ion-icon name="bed-outline"></ion-icon> <span>Furnished</span></div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem; margin-top: 1.5rem;">
+                
+                <!-- Roommate Profile Section -->
+                <div>
+                    <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; color: var(--text-primary);">The Roommate</h3>
+                    <div style="display: flex; align-items: flex-start; gap: 1rem; padding: 1rem; background: var(--bg-color); border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+                        <img id="detailHostAvatar" src="" alt="Avatar" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
+                        <div style="flex: 1;">
+                            <strong id="detailHostName" style="color: var(--text-primary); font-size: 1.1rem; display: block;">Name</strong>
+                            <div id="detailHostBio" style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.3rem;">Bio</div>
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.8rem;">
+                                <span class="status-badge" style="background:var(--accent); color:#0F172A;" id="detailHostAgeGender">Age | Gender</span>
+                                <span class="status-badge status-accepted" id="detailHostJob">Occupation</span>
+                                <span class="status-badge" style="background:var(--card-bg); border:1px solid var(--border-color); color:var(--text-primary);" id="detailHostCleanliness">Cleanliness: 5/5</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preferences Section -->
+                <div>
+                    <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; color: var(--text-primary);">Looking For (Preferences)</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem;" id="detailPreferencesGrid">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+                 <button class="view-apps-btn" onclick="document.getElementById('listingDetailModal').classList.remove('visible')" style="flex: 1; justify-content: center; background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-primary);">
+                     Close
+                 </button>
+                 <button class="btn-primary" id="detailApplyBtn" style="flex: 2; justify-content: center;">
+                    <span class="btn-text">Apply Now <ion-icon name="paper-plane-outline"></ion-icon></span>
+                    <div class="wave-bg"></div>
+                 </button>
             </div>
         </div>
     </div>
