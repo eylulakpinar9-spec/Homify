@@ -1,0 +1,39 @@
+
+        // GET: USERs/Login
+        public ActionResult Login()
+        {
+            return View();
+        }
+
+        // POST: USERs/Login
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Login(string Email)
+        {
+            if (string.IsNullOrEmpty(Email))
+            {
+                ViewBag.Error = "Please enter your email address.";
+                return View();
+            }
+
+            var user = db.USERs.FirstOrDefault(u => u.Email == Email);
+            if (user != null)
+            {
+                // Set session
+                Session["UserID"] = user.UserID;
+                Session["UserName"] = user.Name;
+                Session["UserEmail"] = user.Email;
+
+                return RedirectToAction("Index", "Home");
+            }
+
+            ViewBag.Error = "Email not found in the database. Please try again.";
+            return View();
+        }
+
+        // GET: USERs/Logout
+        public ActionResult Logout()
+        {
+            Session.Clear();
+            return RedirectToAction("Login", "USERs");
+        }

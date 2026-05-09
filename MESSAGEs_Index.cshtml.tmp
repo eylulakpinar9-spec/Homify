@@ -1,0 +1,94 @@
+@model IEnumerable<HomiefyC.Models.MESSAGE>
+
+@{
+    ViewBag.Title = "Messages";
+    int currentUserId = Session["UserID"] != null ? (int)Session["UserID"] : 0;
+    
+    // Group messages by conversation (the other user)
+    var conversations = Model.GroupBy(m => m.SenderUserID == currentUserId ? m.ReceiverUserID : m.SenderUserID).ToList();
+}
+
+<div class="container reveal delay-1 messages-layout" style="display:flex; height: 75vh; gap:20px;">
+    
+    <!-- Inbox Sidebar -->
+    <div class="bento-box bg-white border-radius-large" style="width: 350px; padding: 1.5rem; display: flex; flex-direction: column; flex-shrink: 0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1.5rem;">
+            <h3 style="font-weight: 800; font-size: 1.5rem;">Inbox</h3>
+            <a href="/MESSAGEs/Create" class="btn-primary" style="padding: 5px 10px; text-decoration:none;"><ion-icon name="add-outline"></ion-icon></a>
+        </div>
+        
+        <div style="display: flex; flex-direction: column; gap: 0.5rem; overflow-y: auto;">
+            @if(!conversations.Any())
+            {
+                <p style="color:var(--text-muted); text-align:center;">No messages yet.</p>
+            }
+            else
+            {
+                foreach(var convo in conversations)
+                {
+                    var lastMsg = convo.OrderByDescending(m => m.Timestamp).FirstOrDefault();
+                    var otherUser = lastMsg.SenderUserID == currentUserId ? lastMsg.USER : lastMsg.USER1; // USER is Receiver, USER1 is Sender in scaffold usually. Let's just use the logic
+                    var otherUserName = lastMsg.SenderUserID == currentUserId ? lastMsg.USER.Name : lastMsg.USER1.Name;
+                    
+                    <div style="padding: 1rem; border-radius: var(--radius-sm); background: var(--bg-color); border: 1px solid var(--border-color); cursor: pointer; display: flex; gap: 1rem; align-items: center;">
+                        <img src="https://api.dicebear.com/7.x/notionists/svg?seed=@otherUserName" style="width: 40px; height: 40px; border-radius: 50%; background: var(--card-bg);" alt="Avatar">
+                        <div>
+                            <h4 style="font-size: 1rem; font-weight: 700;">@otherUserName</h4>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;">@lastMsg.Content</p>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+
+    <!-- Chat Area -->
+    <div class="bento-box bg-white border-radius-large" style="flex: 1; padding: 0; display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--border-color); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+        @if(!conversations.Any())
+        {
+            <div style="flex: 1; display:flex; align-items:center; justify-content:center; color:var(--text-muted);">
+                Select a conversation to start messaging.
+            </div>
+        }
+        else
+        {
+            // For simplicity, we just display all messages chronologically in the chat area since it's a basic demo
+            <div style="padding: 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 1rem;">
+                <h4 style="font-size: 1.2rem; font-weight: 700;">Recent Messages</h4>
+            </div>
+
+            <div id="chatMessages" style="flex: 1; padding: 2rem; background: var(--bg-color); overflow-y: auto; display: flex; flex-direction: column; gap: 1rem;">
+                @foreach (var item in Model.OrderBy(m => m.Timestamp))
+                {
+                    bool isMe = item.SenderUserID == currentUserId;
+                    
+                    if (isMe)
+                    {
+                        <div style="align-self: flex-end; background: var(--accent); color: #0F172A; padding: 1rem; border-radius: var(--radius-sm); max-width: 70%;">
+                            <p style="font-size: 0.95rem;">@item.Content</p>
+                            <span style="font-size: 0.7rem; color: rgba(0,0,0,0.5); float: right; margin-top: 0.5rem;">@(item.Timestamp.HasValue ? item.Timestamp.Value.ToString("g") : "")</span>
+                        </div>
+                    }
+                    else
+                    {
+                        <div style="align-self: flex-start; background: var(--card-bg); padding: 1rem; border-radius: var(--radius-sm); max-width: 70%; border: 1px solid var(--border-color);">
+                            <div style="font-size:0.75rem; font-weight:bold; margin-bottom:5px;">@item.USER1.Name</div>
+                            <p style="font-size: 0.95rem;">@item.Content</p>
+                            <span style="font-size: 0.7rem; color: var(--text-muted); float: right; margin-top: 0.5rem;">@(item.Timestamp.HasValue ? item.Timestamp.Value.ToString("g") : "")</span>
+                        </div>
+                    }
+                }
+            </div>
+
+            <div style="padding: 1.5rem; border-top: 1px solid var(--border-color); background: var(--card-bg);">
+                <form action="/MESSAGEs/Create" method="get" style="display: flex; gap: 1rem; align-items: center;">
+                    <input type="text" placeholder="Click Send to compose a new message..." disabled style="flex: 1; padding: 1rem; border-radius: var(--radius-pill); border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-primary); font-size: 1rem; outline: none;">
+                    <button type="submit" class="btn-primary" style="padding: 1rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; width: 50px; height: 50px;">
+                        <ion-icon name="send" style="font-size: 1.2rem;"></ion-icon>
+                        <div class="wave-bg"></div>
+                    </button>
+                </form>
+            </div>
+        }
+    </div>
+</div>

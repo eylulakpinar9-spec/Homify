@@ -1,0 +1,199 @@
+@* DOSYA YOLU: HomiefyC/Views/MESSAGEs/Index.cshtml *@
+@* Mevcut Index.cshtml ile TAMAMEN degistir *@
+@model HomiefyC.ViewModels.MessagesIndexViewModel
+
+@{
+    ViewBag.Title = "Mesajlar";
+    int myId = Session["UserID"] != null ? (int)Session["UserID"] : 0;
+}
+
+@if (ViewBag.Error != null)
+{
+    <div style="background:#fee2e2; color:#991b1b; padding:12px; border-radius:8px; margin-bottom:16px;">
+        @ViewBag.Error
+    </div>
+}
+
+<div style="display:flex; height:75vh; gap:20px;" class="reveal delay-1">
+
+    <!-- ================================================================
+         SOL: Gelen Kutusu + Yeni Mesaj
+    ================================================================ -->
+    <div class="bento-box bg-white border-radius-large"
+         style="width:320px; padding:1.5rem; display:flex; flex-direction:column; flex-shrink:0;
+                box-shadow:0 4px 6px -1px rgba(0,0,0,0.05); overflow:hidden;">
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+            <h3 style="font-weight:800; font-size:1.4rem;">Mesajlar</h3>
+        </div>
+
+        <!-- Yeni Mesaj Formu -->
+        @using (Html.BeginForm("NewMessage", "MESSAGEs", FormMethod.Post,
+                new { style = "margin-bottom:1rem;" }))
+        {
+            @Html.AntiForgeryToken()
+            <div style="display:flex; flex-direction:column; gap:6px;">
+                @Html.DropDownListFor(m => m.NewMessageReceiverID,
+                    Model.AllUsers,
+                    "-- Kisi sec --",
+                    new { style = "padding:8px; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-color); color:var(--text-primary); font-size:0.88rem;" })
+
+                @Html.TextBoxFor(m => m.NewMessageContent, new
+                {
+                    placeholder = "Mesajinizi yazin...",
+                    style = "padding:8px; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-color); color:var(--text-primary); font-size:0.88rem;"
+                })
+
+                <button type="submit"
+                        style="padding:8px; border-radius:8px; background:var(--text-primary); color:var(--bg-color); border:none; cursor:pointer; font-weight:600; font-size:0.88rem;">
+                    <ion-icon name="send-outline"></ion-icon> Gonder
+                </button>
+            </div>
+        }
+
+        <hr style="border-color:var(--border-color); margin:0.5rem 0;">
+
+        <!-- Konusma Listesi -->
+        <div style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:6px; padding-top:4px;">
+            @if (!Model.Conversations.Any())
+            {
+                <p style="color:var(--text-muted); text-align:center; font-size:0.9rem; margin-top:1rem;">
+                    Henuz mesajiniz yok.
+                </p>
+            }
+            else
+            {
+                foreach (var convo in Model.Conversations)
+                {
+                    bool isActive = Model.ActiveConversationUserID == convo.OtherUserID;
+                    <a href="/MESSAGEs/Index?receiverId=@convo.OtherUserID"
+                       style="padding:10px 12px; border-radius:var(--radius-sm); display:flex; gap:10px; align-items:center;
+                              text-decoration:none; color:var(--text-primary);
+                              background:@(isActive ? "var(--card-bg)" : "transparent");
+                              border:1px solid @(isActive ? "var(--border-color)" : "transparent");
+                              transition:all 0.15s;">
+                        <img src="https://api.dicebear.com/7.x/notionists/svg?seed=@convo.OtherUserName"
+                             style="width:36px; height:36px; border-radius:50%; background:var(--card-bg); flex-shrink:0;">
+                        <div style="min-width:0; flex:1;">
+                            <div style="font-weight:700; font-size:0.9rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                @convo.OtherUserName
+                            </div>
+                            <div style="font-size:0.78rem; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                @(string.IsNullOrEmpty(convo.LastMessage) ? "" : convo.LastMessage)
+                            </div>
+                        </div>
+                        @if (convo.LastTime.HasValue)
+                        {
+                            <div style="font-size:0.72rem; color:var(--text-muted); flex-shrink:0;">
+                                @convo.LastTime.Value.ToString("HH:mm")
+                            </div>
+                        }
+                    </a>
+                }
+            }
+        </div>
+    </div>
+
+    <!-- ================================================================
+         SAG: Aktif Sohbet Alani
+    ================================================================ -->
+    <div class="bento-box bg-white border-radius-large"
+         style="flex:1; padding:0; display:flex; flex-direction:column; overflow:hidden;
+                border:1px solid var(--border-color); box-shadow:0 4px 6px -1px rgba(0,0,0,0.05);">
+
+        @if (!Model.ActiveConversationUserID.HasValue || !Model.CurrentChat.Any() && string.IsNullOrEmpty(Model.ActiveConversationUserName))
+        {
+            <!-- Konusma secilmemis -->
+            <div style="flex:1; display:flex; align-items:center; justify-content:center; flex-direction:column; color:var(--text-muted); gap:1rem;">
+                <ion-icon name="chatbubbles-outline" style="font-size:4rem;"></ion-icon>
+                <p style="font-size:1rem;">Bir konusma secin veya yukaridaki formla yeni mesaj gonderin.</p>
+            </div>
+        }
+        else
+        {
+            <!-- Sohbet Baslik -->
+            <div style="padding:1.2rem 1.5rem; border-bottom:1px solid var(--border-color); display:flex; align-items:center; gap:12px;">
+                <img src="https://api.dicebear.com/7.x/notionists/svg?seed=@Model.ActiveConversationUserName"
+                     style="width:40px; height:40px; border-radius:50%; background:var(--card-bg);">
+                <div>
+                    <h4 style="font-size:1.1rem; font-weight:700; margin:0;">@Model.ActiveConversationUserName</h4>
+                </div>
+            </div>
+
+            <!-- Mesaj Baloncuklari -->
+            <div id="chatMessages"
+                 style="flex:1; padding:1.5rem; background:var(--bg-color); overflow-y:auto;
+                        display:flex; flex-direction:column; gap:10px;">
+                @foreach (var msg in Model.CurrentChat)
+                {
+                    if (msg.IsMe)
+                    {
+                        <!-- Benim mesajim (sag) -->
+                        <div style="align-self:flex-end; max-width:70%;">
+                            <div style="background:var(--accent); color:#0F172A; padding:10px 14px;
+                                        border-radius:16px 16px 4px 16px;">
+                                <p style="margin:0; font-size:0.95rem;">@msg.Content</p>
+                            </div>
+                            <div style="font-size:0.72rem; color:var(--text-muted); text-align:right; margin-top:3px;">
+                                @msg.SentAt.ToString("dd MMM HH:mm")
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <!-- Karsidakinin mesaji (sol) -->
+                        <div style="align-self:flex-start; max-width:70%;">
+                            <div style="font-size:0.75rem; font-weight:700; margin-bottom:3px; color:var(--text-muted);">
+                                @msg.SenderName
+                            </div>
+                            <div style="background:var(--card-bg); padding:10px 14px;
+                                        border-radius:16px 16px 16px 4px; border:1px solid var(--border-color);">
+                                <p style="margin:0; font-size:0.95rem;">@msg.Content</p>
+                            </div>
+                            <div style="font-size:0.72rem; color:var(--text-muted); margin-top:3px;">
+                                @msg.SentAt.ToString("dd MMM HH:mm")
+                            </div>
+                        </div>
+                    }
+                }
+                @if (!Model.CurrentChat.Any())
+                {
+                    <p style="color:var(--text-muted); text-align:center; margin:auto;">
+                        Henuz mesaj yok. Ilk mesaji siz gonderin!
+                    </p>
+                }
+            </div>
+
+            <!-- Mesaj Gonderme Formu -->
+            <div style="padding:1.2rem 1.5rem; border-top:1px solid var(--border-color); background:var(--card-bg);">
+                @using (Html.BeginForm("Send", "MESSAGEs", FormMethod.Post,
+                        new { style = "display:flex; gap:10px; align-items:center;" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="receiverId" value="@Model.ActiveConversationUserID" />
+                    <input type="text" name="content"
+                           placeholder="Mesajinizi yazin..."
+                           style="flex:1; padding:0.9rem 1.2rem; border-radius:var(--radius-pill);
+                                  border:1px solid var(--border-color); background:var(--bg-color);
+                                  color:var(--text-primary); font-size:0.95rem; outline:none;"
+                           autocomplete="off" />
+                    <button type="submit"
+                            class="btn-primary"
+                            style="padding:0.9rem; border-radius:50%; display:flex; align-items:center;
+                                   justify-content:center; width:46px; height:46px; flex-shrink:0;">
+                        <ion-icon name="send" style="font-size:1.1rem;"></ion-icon>
+                        <div class="wave-bg"></div>
+                    </button>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        // Mesaj alanini en alta scroll et
+        var chatBox = document.getElementById('chatMessages');
+        if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
+    </script>
+}

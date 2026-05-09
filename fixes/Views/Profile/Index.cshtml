@@ -1,0 +1,252 @@
+@* DOSYA YOLU: HomiefyC/Views/Profile/Index.cshtml *@
+@* Profile klasoru yoksa olusturun. Mevcut dosyayi bu icerik ile degistirin. *@
+@model HomiefyC.ViewModels.ProfileViewModel
+
+@{
+    ViewBag.Title = "Profilim";
+}
+
+@if (ViewBag.Success != null)
+{
+    <div style="background:#d1fae5; color:#065f46; padding:12px 20px; border-radius:8px; margin-bottom:16px; font-weight:600;">
+        ✓ @ViewBag.Success
+    </div>
+}
+@if (ViewBag.Error != null)
+{
+    <div style="background:#fee2e2; color:#991b1b; padding:12px 20px; border-radius:8px; margin-bottom:16px;">
+        @ViewBag.Error
+    </div>
+}
+
+<div class="bento-grid">
+
+    <!-- ================================================================
+         KULLANICI KARTI
+    ================================================================ -->
+    <div class="bento-box bg-white border-radius-large stat-box reveal delay-1"
+         style="grid-column:1/-1; display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:1rem;">
+
+        <div style="display:flex; gap:2rem; align-items:flex-start;">
+            <img src="https://api.dicebear.com/7.x/notionists/svg?seed=@Model.Name"
+                 style="width:120px; height:120px; border-radius:50%; background:var(--bg-color); flex-shrink:0;">
+            <div>
+                <h2 style="font-size:2rem; margin-bottom:4px;">@Model.Name</h2>
+                <p style="color:var(--text-muted); font-size:1rem; margin-bottom:12px;">@Model.Email</p>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                    @if (Model.Age.HasValue)
+                    {
+                        <span class="badge-pill light">Yas: @Model.Age</span>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.Gender))
+                    {
+                        <span class="badge-pill light">Cinsiyet: @Model.Gender</span>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <a href="/USERs/Logout"
+           class="btn-primary"
+           style="background:#ef4444; border-color:#ef4444; text-decoration:none; align-self:flex-start;">
+            <span class="btn-text">Cikis Yap <ion-icon name="log-out-outline"></ion-icon></span>
+            <div class="wave-bg"></div>
+        </a>
+    </div>
+
+    <!-- ================================================================
+         PROFIL BILGILERI (Guncelle Formu)
+    ================================================================ -->
+    <div class="bento-box bg-white border-radius-large stat-box reveal delay-2" style="grid-column:1/-1;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+            <h3>Ev Arkadasi Profili</h3>
+        </div>
+
+        @using (Html.BeginForm("UpdateProfile", "Profile", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(m => m.ProfileID)
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem;">
+                <div style="grid-column:1/-1;">
+                    <label style="font-weight:600; display:block; margin-bottom:4px;">Hakkimda</label>
+                    @Html.TextAreaFor(m => m.Biography, 3, 0, new
+                    {
+                        placeholder = "Kendinizi kisa bir sekilde tanitın...",
+                        style = "width:100%; padding:0.8rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-color); color:var(--text-primary); font-size:0.95rem; resize:vertical; box-sizing:border-box;"
+                    })
+                </div>
+                <div>
+                    <label style="font-weight:600; display:block; margin-bottom:4px;">Meslek</label>
+                    @Html.TextBoxFor(m => m.Occupation, new
+                    {
+                        placeholder = "Ogrenci, Yazilimci...",
+                        style = "width:100%; padding:0.8rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-color); color:var(--text-primary); font-size:0.95rem; box-sizing:border-box;"
+                    })
+                </div>
+                <div>
+                    <label style="font-weight:600; display:block; margin-bottom:4px;">Temizlik Duyarlilik</label>
+                    @Html.DropDownListFor(m => m.CleanlinessLevel,
+                        new System.Web.Mvc.SelectList(new[] { "Cok Temiz", "Temiz", "Orta", "Rahat" }),
+                        "-- Seciniz --",
+                        new { style = "width:100%; padding:0.8rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-color); color:var(--text-primary); font-size:0.95rem;" })
+                </div>
+                <div>
+                    <label style="font-weight:600; display:block; margin-bottom:4px;">Uyku Programi</label>
+                    @Html.DropDownListFor(m => m.SleepSchedule,
+                        new System.Web.Mvc.SelectList(new[] { "Erken Kalkan", "Gece Kusu", "Esnek" }),
+                        "-- Seciniz --",
+                        new { style = "width:100%; padding:0.8rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-color); color:var(--text-primary); font-size:0.95rem;" })
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary" style="margin-top:1.5rem; padding:10px 24px;">
+                <span class="btn-text">Profili Kaydet <ion-icon name="save-outline"></ion-icon></span>
+                <div class="wave-bg"></div>
+            </button>
+        }
+    </div>
+
+    <!-- ================================================================
+         ILANLARIM
+    ================================================================ -->
+    <div class="bento-box bg-white border-radius-large stat-box reveal delay-3" style="grid-column:1/-1;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+            <h3>Ilanlarim (@Model.MyPublishedRooms.Count)</h3>
+            <button type="button" onclick="toggleNewListingForm()"
+                    class="btn-primary" style="padding:8px 18px;">
+                <span class="btn-text"><ion-icon name="add-outline"></ion-icon> Yeni Ilan</span>
+                <div class="wave-bg"></div>
+            </button>
+        </div>
+
+        @if (!Model.MyPublishedRooms.Any())
+        {
+            <p style="color:var(--text-muted); text-align:center; padding:2rem;">
+                Henuz yayinladiginiz ilan yok.
+            </p>
+        }
+        else
+        {
+            <div class="listings-grid">
+                @foreach (var room in Model.MyPublishedRooms)
+                {
+                    <div class="listing-card" style="padding:1.2rem;">
+                        <span class="category-badge">@room.CategoryName</span>
+                        <h4 style="margin-top:0.8rem; margin-bottom:4px;">@room.Title</h4>
+                        <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:10px;">@room.Description</p>
+                        <div class="card-foot">
+                            <div class="card-price">
+                                &#8378;@room.MonthlyRent.ToString("N0")<span class="month">/ay</span>
+                            </div>
+                            <div style="display:flex; gap:5px;">
+                                <a href="/LISTINGs/Edit/@room.ListingID"
+                                   class="view-apps-btn" style="padding:5px 10px; text-decoration:none;">
+                                    <ion-icon name="create-outline"></ion-icon>
+                                </a>
+                                <a href="/LISTINGs/Details/@room.ListingID"
+                                   class="view-apps-btn" style="padding:5px 10px; text-decoration:none;">
+                                    <ion-icon name="eye-outline"></ion-icon>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+        <!-- Yeni Ilan Formu (gizli) -->
+        <div id="newListingForm" style="display:none; margin-top:2rem; padding:2rem;
+                                         border:1px solid var(--border-color); border-radius:var(--radius-lg);">
+            <h4 style="margin-bottom:1.5rem;">Yeni Ilan Ekle</h4>
+            @using (Html.BeginForm("CreateListing", "Profile", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                    <div>
+                        <label style="font-weight:600; display:block; margin-bottom:4px;">Kategori</label>
+                        @{
+                            var catList = ViewBag.Categories as IEnumerable<HomiefyC.Models.CATEGORY>;
+                            var selectItems = catList != null
+                                ? catList.Select(c => new System.Web.Mvc.SelectListItem { Value = c.CategoryID.ToString(), Text = c.CategoryName })
+                                : new System.Collections.Generic.List<System.Web.Mvc.SelectListItem>();
+                        }
+                        <select name="CategoryID" style="width:100%; padding:0.8rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-color); color:var(--text-primary); font-size:0.95rem;">
+                            @foreach (var c in selectItems) { <option value="@c.Value">@c.Text</option> }
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-weight:600; display:block; margin-bottom:4px;">Baslik</label>
+                        <input type="text" name="Title" placeholder="Ilan basligi" required
+                               style="width:100%; padding:0.8rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-color); color:var(--text-primary); font-size:0.95rem; box-sizing:border-box;">
+                    </div>
+                    <div style="grid-column:1/-1;">
+                        <label style="font-weight:600; display:block; margin-bottom:4px;">Aciklama</label>
+                        <textarea name="Description" rows="2" placeholder="Kisa aciklama..."
+                                  style="width:100%; padding:0.8rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-color); color:var(--text-primary); font-size:0.95rem; resize:vertical; box-sizing:border-box;"></textarea>
+                    </div>
+                    <div>
+                        <label style="font-weight:600; display:block; margin-bottom:4px;">Oda No</label>
+                        <input type="text" name="RoomNumber" placeholder="1A, 2B..."
+                               style="width:100%; padding:0.8rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-color); color:var(--text-primary); font-size:0.95rem; box-sizing:border-box;">
+                    </div>
+                    <div>
+                        <label style="font-weight:600; display:block; margin-bottom:4px;">Aylik Kira (&#8378;)</label>
+                        <input type="number" name="MonthlyRent" step="0.01" min="1" placeholder="0" required
+                               style="width:100%; padding:0.8rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-color); color:var(--text-primary); font-size:0.95rem; box-sizing:border-box;">
+                    </div>
+                    <div>
+                        <label style="font-weight:600; display:block; margin-bottom:4px;">Cinsiyet Tercihi</label>
+                        <select name="GenderPreference" style="width:100%; padding:0.8rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-color); color:var(--text-primary);">
+                            <option value="Any">Farketmez</option>
+                            <option value="Male">Erkek</option>
+                            <option value="Female">Kadin</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-weight:600; display:block; margin-bottom:4px;">Yas Araligi</label>
+                        <select name="AgeRange" style="width:100%; padding:0.8rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-color); color:var(--text-primary);">
+                            <option value="">Farketmez</option>
+                            <option value="18-25">18-25</option>
+                            <option value="26-35">26-35</option>
+                            <option value="35+">35+</option>
+                        </select>
+                    </div>
+                    <div style="grid-column:1/-1; display:flex; gap:1.5rem;">
+                        <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                            <input type="checkbox" name="SmokingAllowed" value="true"> Sigara izinli
+                        </label>
+                        <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                            <input type="checkbox" name="PetsAllowed" value="true"> Evcil hayvan izinli
+                        </label>
+                        <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                            <input type="checkbox" name="Furnished" value="true"> Esyali
+                        </label>
+                    </div>
+                </div>
+
+                <div style="margin-top:1.5rem; display:flex; gap:1rem;">
+                    <button type="submit" class="btn-primary" style="padding:10px 24px;">
+                        <span class="btn-text">Ilanimi Yayinla <ion-icon name="rocket-outline"></ion-icon></span>
+                        <div class="wave-bg"></div>
+                    </button>
+                    <button type="button" onclick="toggleNewListingForm()"
+                            style="padding:10px 20px; border:1px solid var(--border-color); border-radius:var(--radius-pill); background:transparent; cursor:pointer; color:var(--text-primary);">
+                        Iptal
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+
+</div>
+
+@section scripts {
+    <script>
+        function toggleNewListingForm() {
+            var form = document.getElementById('newListingForm');
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+    </script>
+}

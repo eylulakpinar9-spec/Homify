@@ -1,0 +1,204 @@
+@* DOSYA YOLU: HomiefyC/Views/Home/Index.cshtml *@
+@* Mevcut Index.cshtml ile TAMAMEN degistir *@
+@model IEnumerable<HomiefyC.ViewModels.RecentListingViewModel>
+
+@{
+    ViewBag.Title = "Ana Sayfa";
+}
+
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="hero-main neative-dark border-radius-large reveal delay-1">
+        <div class="hero-content">
+            <div class="badge-pill light">
+                @ViewBag.TotalUsers kullanici tarafindan guveniliyor
+                <ion-icon name="arrow-forward-outline"></ion-icon>
+            </div>
+            <h1 class="ultra-title">Temiz bir yuva<br>buradan baslar</h1>
+            <p>Ihtiyaclariniza ozel mükemmel ev arkadasini ve premium yasam alanlarini bulun.</p>
+            <div class="search-bar">
+                <ion-icon name="search-outline"></ion-icon>
+                <input type="text" id="citySearch" placeholder="Ilan ara...">
+                <button class="btn-primary" id="searchBtn">
+                    <span class="btn-text">Kesfet <ion-icon name="arrow-forward-outline"></ion-icon></span>
+                    <div class="wave-bg"></div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bento Stats -->
+    <div class="bento-grid">
+        <div class="bento-box bg-white border-radius-large stat-box reveal delay-2">
+            <div class="bento-header">
+                <h3>Kategoriler</h3>
+                <p class="subtitle">Kategoriye Gore Ilanlar</p>
+            </div>
+            <div style="position: relative; height:200px; width:100%">
+                <canvas id="categoryChart"></canvas>
+            </div>
+        </div>
+
+        <div class="bento-box neative-accent border-radius-large stat-box reveal delay-3">
+            <div class="bento-header dark-text">
+                <h3>Piyasa Ortalamasi</h3>
+                <p class="subtitle">Kategoriye Gore Ortalama Kira</p>
+            </div>
+            <div style="position: relative; height:200px; width:100%">
+                <canvas id="rentChart"></canvas>
+            </div>
+            <div class="accent-decoration">
+                <ion-icon name="trending-up-outline"></ion-icon>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Recent Listings Section -->
+<section class="listings-section">
+    <div class="section-header reveal">
+        <h2>Son Ilanlar</h2>
+        <div class="filter-chip">@ViewBag.TotalListings toplam ilan</div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div style="text-align:center; padding:4rem; color:var(--text-muted);">
+            <ion-icon name="home-outline" style="font-size:3rem;"></ion-icon>
+            <p style="margin-top:1rem;">Henuz hic ilan yok.</p>
+        </div>
+    }
+
+    <div class="listings-grid">
+        @foreach (var item in Model)
+        {
+            <div class="bento-box bg-white border-radius-large reveal"
+                 style="padding: 1.5rem; border: 1px solid var(--border-color); display:flex; flex-direction:column; justify-content:space-between;">
+
+                <!-- Ust: Kategori + Fiyat -->
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <span class="badge-pill light" style="font-size:0.75rem;">
+                        @(string.IsNullOrEmpty(item.CategoryName) ? "Genel" : item.CategoryName)
+                    </span>
+                    <strong style="color:var(--text-primary); font-size:1rem;">
+                        @if (item.MonthlyRent > 0)
+                        {
+                            <text>&#8378;@item.MonthlyRent.ToString("N0")/ay</text>
+                        }
+                        else
+                        {
+                            <text>Fiyat Yok</text>
+                        }
+                    </strong>
+                </div>
+
+                <!-- Baslik -->
+                <h3 style="margin-bottom:8px; font-size:1.1rem;">
+                    @(string.IsNullOrEmpty(item.Title) ? "(Basliksiz)" : item.Title)
+                </h3>
+
+                <!-- Oda no -->
+                @if (!string.IsNullOrEmpty(item.RoomNumber))
+                {
+                    <div style="display:flex; align-items:center; gap:5px; color:var(--text-muted); font-size:0.85rem; margin-bottom:8px;">
+                        <ion-icon name="bed-outline"></ion-icon>
+                        <span>Oda: @item.RoomNumber</span>
+                    </div>
+                }
+
+                <!-- Aciklama -->
+                <p style="color:var(--text-muted); font-size:0.88rem; margin-bottom:15px; flex:1;">
+                    @(string.IsNullOrEmpty(item.Description) ? "Aciklama yok." : item.Description)
+                </p>
+
+                <!-- Tarih -->
+                @if (item.CreatedAt.HasValue)
+                {
+                    <p style="color:var(--text-muted); font-size:0.75rem; margin-bottom:12px;">
+                        <ion-icon name="time-outline"></ion-icon>
+                        @item.CreatedAt.Value.ToString("dd MMM yyyy")
+                    </p>
+                }
+
+                <!-- Butonlar -->
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                    <a href="/LISTINGs/Details/@item.ListingID"
+                       class="btn-primary"
+                       style="display:inline-flex; align-items:center; gap:5px; padding:7px 14px; text-decoration:none; font-size:0.9rem;">
+                        <ion-icon name="eye-outline"></ion-icon> Incele
+                        <div class="wave-bg"></div>
+                    </a>
+
+                    @if (item.IsLoggedIn)
+                    {
+                        <form action="/FAVORITEs/Add" method="post" style="display:inline;">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="listingId" value="@item.ListingID" />
+                            <button type="submit"
+                                    style="display:inline-flex; align-items:center; gap:5px; padding:7px 14px;
+                                           border:1px solid var(--border-color); border-radius:var(--radius-pill);
+                                           background:transparent; cursor:pointer; font-size:0.9rem; color:var(--text-primary);">
+                                <ion-icon name="heart-outline"></ion-icon> Kaydet
+                            </button>
+                        </form>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</section>
+
+@section scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Kategori grafigi
+            var catCtx = document.getElementById('categoryChart').getContext('2d');
+            new Chart(catCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: [@Html.Raw(ViewBag.CategoryLabels)],
+                    datasets: [{
+                        data: [@ViewBag.CategoryData],
+                        backgroundColor: ['#0F172A', '#64748B', '#E6FB00', '#CBD5E1'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'right' } }
+                }
+            });
+
+            // Kira grafigi
+            var rentCtx = document.getElementById('rentChart').getContext('2d');
+            new Chart(rentCtx, {
+                type: 'bar',
+                data: {
+                    labels: [@Html.Raw(ViewBag.RentLabels)],
+                    datasets: [{
+                        label: 'Ort. Kira',
+                        data: [@ViewBag.RentData],
+                        backgroundColor: '#111A29',
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+
+            // Arama filtresi
+            document.getElementById('searchBtn').addEventListener('click', function () {
+                var term = document.getElementById('citySearch').value.toLowerCase();
+                document.querySelectorAll('.listings-grid .bento-box').forEach(function (card) {
+                    var text = card.innerText.toLowerCase();
+                    card.style.display = text.includes(term) ? '' : 'none';
+                });
+            });
+        });
+    </script>
+}

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Homiefy</title>
+    <!-- Import Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    @Styles.Render("~/Content/css")
+    <!-- Homiefy Custom Styles -->
+    <link rel="stylesheet" href="~/Content/styles.css" />
+
+    @Scripts.Render("~/bundles/modernizr")
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script>
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar reveal" style="position: relative; margin-bottom: 20px;">
+        <div class="nav-container">
+            <a href="/Home/Index" class="logo" style="text-decoration:none;">
+                <div class="logo-icon"><ion-icon name="home"></ion-icon></div>
+                <span>Homiefy</span>
+            </a>
+            <div class="nav-links">
+                @Html.ActionLink("Listings", "Index", "LISTINGs", new { area = "" }, new { @class = "" })
+                @Html.ActionLink("Rooms", "Index", "ROOMs", new { area = "" }, new { @class = "" })
+                @Html.ActionLink("Users", "Index", "USERs", new { area = "" }, new { @class = "" })
+                @Html.ActionLink("Categories", "Index", "CATEGORies", new { area = "" }, new { @class = "" })
+                @Html.ActionLink("Applications", "Index", "APPLICATIONS", new { area = "" }, new { @class = "" })
+            </div>
+            <div class="nav-actions">
+                <button id="themeToggle" class="theme-switch" aria-label="Toggle Theme">
+                    <ion-icon name="sunny" class="sun-icon"></ion-icon>
+                    <ion-icon name="moon" class="moon-icon"></ion-icon>
+                </button>
+                <a href="/PROFILEs" class="user-profile" style="text-decoration: none;">
+                    <span>Admin</span>
+                    <img src="https://api.dicebear.com/7.x/notionists/svg?seed=Admin" alt="Avatar" class="avatar">
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container body-content" style="min-height: 80vh;">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - Homiefy Next-Gen Roommate Matching</p>
+        </footer>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    <!-- Custom JS -->
+    <script src="~/Scripts/app.js"></script>
+    @RenderSection("scripts", required: false)
+</body>
+</html>

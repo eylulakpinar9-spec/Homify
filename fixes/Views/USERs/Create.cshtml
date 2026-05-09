@@ -1,0 +1,182 @@
+@* DOSYA YOLU: HomiefyC/Views/USERs/Create.cshtml *@
+@* Mevcut Create.cshtml ile TAMAMEN degistir *@
+@model HomiefyC.ViewModels.RegisterViewModel
+
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homify | Kayit Ol</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/Content/styles.css">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script>
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+</head>
+<body>
+    <nav class="navbar reveal">
+        <div class="nav-container">
+            <a href="/Home/Index" class="logo" style="text-decoration:none;">
+                <div class="logo-icon"><ion-icon name="home"></ion-icon></div>
+                <span>Homify</span>
+            </a>
+            <button id="themeToggle" class="theme-switch" aria-label="Toggle Theme">
+                <ion-icon name="sunny" class="sun-icon"></ion-icon>
+                <ion-icon name="moon" class="moon-icon"></ion-icon>
+            </button>
+        </div>
+    </nav>
+
+    <main class="container" style="display:flex; justify-content:center; align-items:center; min-height:80vh; padding:2rem 0;">
+        <div class="bento-box bg-white border-radius-large reveal"
+             style="width:100%; max-width:520px; padding:3rem;
+                    box-shadow:0 20px 40px -10px rgba(0,0,0,0.1); border:1px solid var(--border-color);">
+
+            <h1 class="ultra-title" style="font-size:2.2rem; margin-bottom:0.5rem; text-align:center;">Hesap Olustur</h1>
+            <p class="subtitle" style="margin-bottom:2rem; text-align:center;">Homify'e katilmak icin kayit olun</p>
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div style="background:#fee2e2; color:#991b1b; padding:12px; border-radius:8px; margin-bottom:16px;">
+                    @Html.ValidationSummary(false)
+                </div>
+            }
+
+            @using (Html.BeginForm("Create", "USERs", FormMethod.Post,
+                    new { style = "display:flex; flex-direction:column; gap:1rem;" }))
+            {
+                @Html.AntiForgeryToken()
+
+                @* Ad Soyad *@
+                <div>
+                    @Html.LabelFor(m => m.Name, new { style = "font-weight:600; font-size:0.9rem; display:block; margin-bottom:4px;" })
+                    @Html.TextBoxFor(m => m.Name, new
+                    {
+                        placeholder = "Ad Soyadinizi girin",
+                        style = "width:100%; padding:0.9rem; border-radius:var(--radius-sm); border:1px solid var(--border-color); background:var(--bg-color); color:var(--text-primary); font-size:1rem; outline:none; box-sizing:border-box;"
+                    })
+                    @Html.ValidationMessageFor(m => m.Name, "", new { style = "color:red; font-size:0.8rem;" })
+                </div>
+
+                @* Email *@
+                <div>
+                    @Html.LabelFor(m => m.Email, new { style = "font-weight:600; font-size:0.9rem; display:block; margin-bottom:4px;" })
+                    @Html.TextBoxFor(m => m.Email, new
+                    {
+                        type = "email",
+                        placeholder = "ornek@email.com",
+                        style = "width:100%; padding:0.9rem; border-radius:var(--radius-sm); border:1px solid var(--border-color); background:var(--bg-color); color:var(--text-primary); font-size:1rem; outline:none; box-sizing:border-box;"
+                    })
+                    @Html.ValidationMessageFor(m => m.Email, "", new { style = "color:red; font-size:0.8rem;" })
+                </div>
+
+                @* Sifre *@
+                <div>
+                    @Html.LabelFor(m => m.Password, new { style = "font-weight:600; font-size:0.9rem; display:block; margin-bottom:4px;" })
+                    <div style="position:relative;">
+                        @Html.PasswordFor(m => m.Password, new
+                        {
+                            id = "passInput",
+                            placeholder = "En az 6 karakter",
+                            style = "width:100%; padding:0.9rem; padding-right:3rem; border-radius:var(--radius-sm); border:1px solid var(--border-color); background:var(--bg-color); color:var(--text-primary); font-size:1rem; outline:none; box-sizing:border-box;"
+                        })
+                        <button type="button" onclick="togglePass('passInput','eye1')"
+                                style="position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; color:var(--text-muted);">
+                            <ion-icon name="eye-outline" id="eye1"></ion-icon>
+                        </button>
+                    </div>
+                    @Html.ValidationMessageFor(m => m.Password, "", new { style = "color:red; font-size:0.8rem;" })
+                </div>
+
+                @* Sifre Tekrar *@
+                <div>
+                    @Html.LabelFor(m => m.ConfirmPassword, new { style = "font-weight:600; font-size:0.9rem; display:block; margin-bottom:4px;" })
+                    <div style="position:relative;">
+                        @Html.PasswordFor(m => m.ConfirmPassword, new
+                        {
+                            id = "confirmInput",
+                            placeholder = "Sifreyi tekrar girin",
+                            style = "width:100%; padding:0.9rem; padding-right:3rem; border-radius:var(--radius-sm); border:1px solid var(--border-color); background:var(--bg-color); color:var(--text-primary); font-size:1rem; outline:none; box-sizing:border-box;"
+                        })
+                        <button type="button" onclick="togglePass('confirmInput','eye2')"
+                                style="position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; color:var(--text-muted);">
+                            <ion-icon name="eye-outline" id="eye2"></ion-icon>
+                        </button>
+                    </div>
+                    @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { style = "color:red; font-size:0.8rem;" })
+                </div>
+
+                @* Telefon, Yas, Cinsiyet - yan yana *@
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                    <div>
+                        @Html.LabelFor(m => m.PhoneNumber, new { style = "font-weight:600; font-size:0.9rem; display:block; margin-bottom:4px;" })
+                        @Html.TextBoxFor(m => m.PhoneNumber, new
+                        {
+                            placeholder = "05xx xxx xx xx",
+                            style = "width:100%; padding:0.9rem; border-radius:var(--radius-sm); border:1px solid var(--border-color); background:var(--bg-color); color:var(--text-primary); font-size:0.95rem; outline:none; box-sizing:border-box;"
+                        })
+                        @Html.ValidationMessageFor(m => m.PhoneNumber, "", new { style = "color:red; font-size:0.8rem;" })
+                    </div>
+                    <div>
+                        @Html.LabelFor(m => m.Age, new { style = "font-weight:600; font-size:0.9rem; display:block; margin-bottom:4px;" })
+                        @Html.TextBoxFor(m => m.Age, new
+                        {
+                            type = "number",
+                            min = "18",
+                            max = "99",
+                            placeholder = "18+",
+                            style = "width:100%; padding:0.9rem; border-radius:var(--radius-sm); border:1px solid var(--border-color); background:var(--bg-color); color:var(--text-primary); font-size:0.95rem; outline:none; box-sizing:border-box;"
+                        })
+                        @Html.ValidationMessageFor(m => m.Age, "", new { style = "color:red; font-size:0.8rem;" })
+                    </div>
+                </div>
+
+                <div>
+                    @Html.LabelFor(m => m.Gender, new { style = "font-weight:600; font-size:0.9rem; display:block; margin-bottom:4px;" })
+                    @Html.DropDownListFor(m => m.Gender,
+                        new System.Web.Mvc.SelectList(new[] { "Male", "Female", "Other" }),
+                        "-- Cinsiyet Secin --",
+                        new { style = "width:100%; padding:0.9rem; border-radius:var(--radius-sm); border:1px solid var(--border-color); background:var(--bg-color); color:var(--text-primary); font-size:0.95rem; outline:none; box-sizing:border-box;" })
+                    @Html.ValidationMessageFor(m => m.Gender, "", new { style = "color:red; font-size:0.8rem;" })
+                </div>
+
+                <button type="submit" class="btn-primary"
+                        style="margin-top:1rem; width:100%; justify-content:center; padding:1.2rem;">
+                    <span class="btn-text">Kayit Ol <ion-icon name="person-add-outline"></ion-icon></span>
+                    <div class="wave-bg"></div>
+                </button>
+            }
+
+            <p style="margin-top:1.5rem; color:var(--text-muted); font-size:0.9rem; text-align:center;">
+                Zaten hesabiniz var mi?
+                <a href="/USERs/Login" style="color:var(--text-primary); font-weight:600; text-decoration:none;">Giris Yap</a>
+            </p>
+        </div>
+    </main>
+
+    <script src="~/Scripts/app.js"></script>
+    <script>
+        function togglePass(inputId, iconId) {
+            var inp = document.getElementById(inputId);
+            var ico = document.getElementById(iconId);
+            if (inp.type === 'password') {
+                inp.type = 'text';
+                ico.setAttribute('name', 'eye-off-outline');
+            } else {
+                inp.type = 'password';
+                ico.setAttribute('name', 'eye-outline');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+@model IEnumerable<HomiefyC.Models.APPLICATION>
+
+@{
+    ViewBag.Title = "My Applications";
+}
+
+<section class="listings-section reveal delay-1">
+    <div class="section-header" style="display:flex; justify-content:space-between; align-items:center;">
+        <h2>My Applications</h2>
+        <div style="display:flex; gap:10px;">
+            <div class="filter-chip">@Model.Count() applications</div>
+            <a href="/APPLICATIONS/Create" class="btn-primary" style="padding: 5px 15px; text-decoration:none;">Create New</a>
+        </div>
+    </div>
+    
+    <div class="listings-grid">
+        @if (!Model.Any())
+        {
+            <div style="grid-column: 1/-1; text-align: center; padding: 4rem 2rem; background: var(--card-bg); border-radius: var(--radius-lg); border: 1px dashed var(--border-color);">
+                <ion-icon name="document-text-outline" style="font-size: 4rem; color: var(--text-muted); margin-bottom: 1rem;"></ion-icon>
+                <h3 style="color: var(--text-primary); font-size: 1.5rem; margin-bottom: 0.5rem;">No applications yet</h3>
+                <p style="color: var(--text-muted);">You haven't applied to any rooms yet. Explore listings to find your new home.</p>
+            </div>
+        }
+        else
+        {
+            foreach (var item in Model) {
+                <div class="listing-card reveal delay-1" style="position: relative;">
+                    <span class="category-badge" style="background:var(--accent); color:#0F172A;">@item.Status</span>
+                    
+                    <div style="padding-top: 1.2rem;">
+                        <h3 style="padding-right: 3rem;">Room @item.ROOM.RoomNumber</h3>
+                        <div class="card-location">
+                            <ion-icon name="business-outline"></ion-icon> Listing: @item.ROOM.LISTING.Title
+                        </div>
+                        <p style="margin-top:10px;"><strong>Date:</strong> @(item.ApplicationDate.HasValue ? item.ApplicationDate.Value.ToShortDateString() : "N/A")</p>
+                    </div>
+                    
+                    <div class="card-foot" style="margin-top: 1rem; position: relative; z-index: 5;">
+                        <div style="display:flex; gap:5px; width:100%; justify-content:flex-end;">
+                            <a href="/APPLICATIONS/Edit/@item.ApplicationID" class="view-apps-btn" style="padding: 0.4rem 0.8rem; text-decoration:none;"><ion-icon name="create-outline"></ion-icon> Edit</a>
+                            <a href="/APPLICATIONS/Delete/@item.ApplicationID" class="view-apps-btn" style="padding: 0.4rem 0.8rem; text-decoration:none; color: red;"><ion-icon name="trash-outline"></ion-icon> Delete</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</section>

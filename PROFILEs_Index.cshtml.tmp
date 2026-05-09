@@ -1,0 +1,66 @@
+@model IEnumerable<HomiefyC.Models.PROFILE>
+
+@{
+    ViewBag.Title = "My Profile";
+    var user = ViewBag.User as HomiefyC.Models.USER;
+    var profile = Model.FirstOrDefault();
+}
+
+<div class="bento-grid">
+    <div class="bento-box bg-white border-radius-large stat-box reveal delay-1" style="grid-column: 1/-1;">
+        <div class="bento-header" style="display:flex; justify-content:space-between; align-items:center;">
+            <h3>My Account</h3>
+            <a href="/USERs/Logout" class="btn-primary" style="background:red; border-color:red; text-decoration:none;">Sign Out</a>
+        </div>
+        
+        <div style="display:flex; gap: 2rem; align-items:flex-start; margin-top:20px;">
+            <img src="https://api.dicebear.com/7.x/notionists/svg?seed=@(user?.Name)" style="width: 150px; height: 150px; border-radius: 50%; background: var(--bg-color);" alt="Avatar">
+            <div style="flex:1;">
+                <h2 style="font-size:2rem;">@user?.Name</h2>
+                <p style="color:var(--text-muted); font-size:1.1rem;">@user?.Email</p>
+                <div style="display:flex; gap:10px; margin-top:15px;">
+                    <span class="badge-pill light">Age: @user?.Age</span>
+                    <span class="badge-pill light">Gender: @user?.Gender</span>
+                </div>
+                <div style="margin-top:20px;">
+                    <a href="/USERs/Edit/@user?.UserID" class="btn-primary" style="text-decoration:none;">Edit Account</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (profile != null)
+    {
+        <div class="bento-box bg-white border-radius-large stat-box reveal delay-2" style="grid-column: 1/-1;">
+            <div class="bento-header" style="display:flex; justify-content:space-between; align-items:center;">
+                <h3>Roommate Profile</h3>
+                <a href="/PROFILEs/Edit/@profile.ProfileID" class="btn-primary" style="text-decoration:none;">Edit Profile</a>
+            </div>
+            <div style="margin-top:20px; display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+                <div>
+                    <strong>Biography:</strong>
+                    <p style="color:var(--text-muted); margin-top:5px;">@profile.Biography</p>
+                </div>
+                <div>
+                    <strong>Occupation:</strong>
+                    <p style="color:var(--text-muted); margin-top:5px;">@profile.Occupation</p>
+                </div>
+                <div>
+                    <strong>Cleanliness Level:</strong>
+                    <p style="color:var(--text-muted); margin-top:5px;">@profile.CleanlinessLevel</p>
+                </div>
+                <div>
+                    <strong>Sleep Schedule:</strong>
+                    <p style="color:var(--text-muted); margin-top:5px;">@profile.SleepSchedule</p>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="bento-box bg-white border-radius-large stat-box reveal delay-2" style="grid-column: 1/-1; text-align:center; padding: 40px;">
+            <p style="color:var(--text-muted); margin-bottom:20px;">You haven't created a roommate profile yet.</p>
+            <a href="/PROFILEs/Create" class="btn-primary" style="text-decoration:none;">Create Profile</a>
+        </div>
+    }
+</div>

@@ -1,0 +1,48 @@
+@model IEnumerable<HomiefyC.Models.FAVORITE>
+
+@{
+    ViewBag.Title = "Favorites";
+}
+
+<section class="listings-section reveal delay-1">
+    <div class="section-header" style="display:flex; justify-content:space-between; align-items:center;">
+        <h2>Your Favorites</h2>
+        <div class="filter-chip" id="favoritesCount">@Model.Count() saved</div>
+    </div>
+    
+    <div class="listings-grid" id="favoritesGrid">
+        @if (!Model.Any())
+        {
+            <div style="grid-column: 1/-1; text-align: center; padding: 4rem 2rem; background: var(--card-bg); border-radius: var(--radius-lg); border: 1px dashed var(--border-color);">
+                <ion-icon name="heart-dislike-outline" style="font-size: 4rem; color: var(--text-muted); margin-bottom: 1rem;"></ion-icon>
+                <h3 style="color: var(--text-primary); font-size: 1.5rem; margin-bottom: 0.5rem;">No favorites yet</h3>
+                <p style="color: var(--text-muted);">Explore listings and save them here.</p>
+            </div>
+        }
+        else
+        {
+            foreach (var item in Model) {
+                var l = item.LISTING;
+                <div class="listing-card reveal delay-1" style="position: relative;">
+                    <span class="category-badge">@l.CATEGORY.CategoryName</span>
+                    <div style="position: absolute; top: 1.5rem; right: 1.5rem; font-size: 1.5rem; color: var(--accent); cursor: pointer;">
+                        <a href="/FAVORITEs/Delete/@item.FavoriteID" style="color:inherit; text-decoration:none;"><ion-icon name="heart"></ion-icon></a>
+                    </div>
+                    <div style="padding-top: 1.2rem;">
+                        <h3 style="padding-right: 3rem;">@l.Title</h3>
+                        <div class="card-location">
+                            <ion-icon name="location"></ion-icon> Saved on: @(item.DateSaved.HasValue ? item.DateSaved.Value.ToShortDateString() : "")
+                        </div>
+                        <p>@(l.Description != null && l.Description.Length > 80 ? l.Description.Substring(0, 80) + "..." : l.Description)</p>
+                    </div>
+                    
+                    <div class="card-foot" style="margin-top: 1rem; position: relative; z-index: 5;">
+                        <a href="/LISTINGs/Details/@l.ListingID" class="view-apps-btn" style="text-decoration:none; width:100%; justify-content:center;">
+                            <ion-icon name="paper-plane-outline"></ion-icon> View & Apply
+                        </a>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</section>

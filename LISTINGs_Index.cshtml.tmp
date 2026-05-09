@@ -1,0 +1,46 @@
+@model IEnumerable<HomiefyC.Models.LISTING>
+
+@{
+    ViewBag.Title = "Listings";
+}
+
+<section class="listings-section reveal delay-1">
+    <div class="section-header" style="display:flex; justify-content:space-between; align-items:center;">
+        <h2>All Listings</h2>
+        <div style="display:flex; gap:10px;">
+            <div class="filter-chip">@Model.Count() listings</div>
+            <a href="/LISTINGs/Create" class="btn-primary" style="padding: 5px 15px; text-decoration:none;">Create New</a>
+        </div>
+    </div>
+    
+    <div class="listings-grid">
+        @foreach (var item in Model) {
+            <div class="listing-card reveal delay-1" style="position: relative;">
+                <span class="category-badge">@item.CATEGORY.CategoryName</span>
+                
+                <div style="padding-top: 1.2rem;">
+                    <h3 style="padding-right: 3rem;">@item.Title</h3>
+                    <div class="card-location">
+                        <ion-icon name="person-outline"></ion-icon> @item.USER.Name
+                    </div>
+                    <p>@(item.Description != null && item.Description.Length > 80 ? item.Description.Substring(0, 80) + "..." : item.Description)</p>
+                </div>
+                
+                <div class="card-foot" style="margin-top: 1rem; position: relative; z-index: 5;">
+                    <div class="card-price">
+                        @{
+                            var room = item.ROOMs.FirstOrDefault();
+                            var price = room != null ? room.MonthlyRent.ToString("C") : "₺0";
+                        }
+                        @price<span class="month">/mo</span>
+                    </div>
+                    <div style="display:flex; gap:5px;">
+                        <a href="/LISTINGs/Edit/@item.ListingID" class="view-apps-btn" style="padding: 0.4rem 0.8rem; text-decoration:none;"><ion-icon name="create-outline"></ion-icon></a>
+                        <a href="/LISTINGs/Details/@item.ListingID" class="view-apps-btn" style="padding: 0.4rem 0.8rem; text-decoration:none;"><ion-icon name="eye-outline"></ion-icon></a>
+                        <a href="/LISTINGs/Delete/@item.ListingID" class="view-apps-btn" style="padding: 0.4rem 0.8rem; text-decoration:none; color: red;"><ion-icon name="trash-outline"></ion-icon></a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</section>

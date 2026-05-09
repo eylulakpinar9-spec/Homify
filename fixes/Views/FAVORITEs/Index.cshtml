@@ -1,0 +1,111 @@
+@* DOSYA YOLU: HomiefyC/Views/FAVORITEs/Index.cshtml *@
+@* Mevcut Index.cshtml ile TAMAMEN degistir *@
+@model IEnumerable<HomiefyC.ViewModels.FavoriteListingViewModel>
+
+@{
+    ViewBag.Title = "Favorilerim";
+}
+
+<section class="listings-section reveal delay-1">
+    <div class="section-header" style="display:flex; justify-content:space-between; align-items:center;">
+        <h2>Favorilerim</h2>
+        <div class="filter-chip">@Model.Count() kaydedildi</div>
+    </div>
+
+    @if (ViewBag.Error != null)
+    {
+        <div style="background:#fee2e2; color:#991b1b; padding:16px; border-radius:8px; margin-bottom:20px;">
+            @ViewBag.Error
+        </div>
+    }
+
+    <div class="listings-grid" id="favoritesGrid">
+        @if (!Model.Any())
+        {
+            <div style="grid-column:1/-1; text-align:center; padding:4rem 2rem;
+                        background:var(--card-bg); border-radius:var(--radius-lg);
+                        border:1px dashed var(--border-color);">
+                <ion-icon name="heart-dislike-outline"
+                          style="font-size:4rem; color:var(--text-muted); display:block; margin-bottom:1rem;"></ion-icon>
+                <h3 style="color:var(--text-primary); font-size:1.5rem; margin-bottom:0.5rem;">Henuz favori eklenmedi</h3>
+                <p style="color:var(--text-muted); margin-bottom:1.5rem;">
+                    Ilanlari inceleyerek kalp ikonuna tiklayin.
+                </p>
+                <a href="/Home/Index" class="btn-primary" style="text-decoration:none;">
+                    <span class="btn-text">Ilanlara Goz At <ion-icon name="arrow-forward-outline"></ion-icon></span>
+                    <div class="wave-bg"></div>
+                </a>
+            </div>
+        }
+        else
+        {
+            foreach (var item in Model)
+            {
+                <div class="listing-card reveal delay-1"
+                     style="position:relative; display:flex; flex-direction:column; justify-content:space-between;">
+
+                    <!-- Kategori rozeti -->
+                    <span class="category-badge">
+                        @(string.IsNullOrEmpty(item.CategoryName) ? "Genel" : item.CategoryName)
+                    </span>
+
+                    <!-- Favori kalp / cikar butonu (sag ust) -->
+                    <div style="position:absolute; top:1.2rem; right:1.2rem; z-index:10;">
+                        <form action="/FAVORITEs/Remove" method="post" style="display:inline;">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="listingId" value="@item.ListingID" />
+                            <button type="submit"
+                                    title="Favoriden cikar"
+                                    style="background:none; border:none; cursor:pointer; font-size:1.5rem; color:#ef4444;">
+                                <ion-icon name="heart"></ion-icon>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Icerik -->
+                    <div style="padding-top:1.2rem; flex:1;">
+                        <h3 style="padding-right:3rem; margin-bottom:8px;">
+                            @(string.IsNullOrEmpty(item.Title) ? "(Basliksiz ilan)" : item.Title)
+                        </h3>
+
+                        @if (item.SavedAt.HasValue)
+                        {
+                            <div class="card-location" style="margin-bottom:8px;">
+                                <ion-icon name="bookmark-outline"></ion-icon>
+                                Kaydedildi: @item.SavedAt.Value.ToString("dd MMM yyyy")
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrEmpty(item.Description))
+                        {
+                            <p style="color:var(--text-muted); font-size:0.88rem; margin-bottom:10px;">
+                                @(item.Description.Length > 100
+                                    ? item.Description.Substring(0, 100) + "..."
+                                    : item.Description)
+                            </p>
+                        }
+                    </div>
+
+                    <!-- Alt: Fiyat + Detay butonu -->
+                    <div class="card-foot" style="margin-top:1rem; position:relative; z-index:5;">
+                        <div class="card-price">
+                            @if (item.MonthlyRent > 0)
+                            {
+                                <text>&#8378;@item.MonthlyRent.ToString("N0")<span class="month">/ay</span></text>
+                            }
+                            else
+                            {
+                                <text>Fiyat Yok</text>
+                            }
+                        </div>
+                        <a href="/LISTINGs/Details/@item.ListingID"
+                           class="view-apps-btn"
+                           style="text-decoration:none; display:inline-flex; align-items:center; gap:5px;">
+                            <ion-icon name="eye-outline"></ion-icon> Incele &amp; Basvur
+                        </a>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</section>

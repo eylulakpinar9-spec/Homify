@@ -1,0 +1,42 @@
+@model IEnumerable<HomiefyC.Models.ROOM>
+
+@{
+    ViewBag.Title = "Rooms";
+}
+
+<section class="listings-section reveal delay-1">
+    <div class="section-header" style="display:flex; justify-content:space-between; align-items:center;">
+        <h2>All Rooms</h2>
+        <div style="display:flex; gap:10px;">
+            <div class="filter-chip">@Model.Count() rooms</div>
+            <a href="/ROOMs/Create" class="btn-primary" style="padding: 5px 15px; text-decoration:none;">Create New</a>
+        </div>
+    </div>
+    
+    <div class="listings-grid">
+        @foreach (var item in Model) {
+            <div class="listing-card reveal delay-1" style="position: relative;">
+                <span class="category-badge">Room @item.RoomNumber</span>
+                
+                <div style="padding-top: 1.2rem;">
+                    <h3 style="padding-right: 3rem;">@item.LISTING.Title</h3>
+                    <div class="card-location">
+                        <ion-icon name="expand-outline"></ion-icon> @item.Size m²
+                    </div>
+                    <p style="margin-top:10px;"><strong>Furnished:</strong> @(item.Furnished.HasValue && item.Furnished.Value ? "Yes" : "No")</p>
+                </div>
+                
+                <div class="card-foot" style="margin-top: 1rem; position: relative; z-index: 5;">
+                    <div class="card-price">
+                        @item.MonthlyRent.ToString("C")<span class="month">/mo</span>
+                    </div>
+                    <div style="display:flex; gap:5px;">
+                        <a href="/ROOMs/Edit/@item.RoomID" class="view-apps-btn" style="padding: 0.4rem 0.8rem; text-decoration:none;"><ion-icon name="create-outline"></ion-icon></a>
+                        <a href="/ROOMs/Details/@item.RoomID" class="view-apps-btn" style="padding: 0.4rem 0.8rem; text-decoration:none;"><ion-icon name="eye-outline"></ion-icon></a>
+                        <a href="/ROOMs/Delete/@item.RoomID" class="view-apps-btn" style="padding: 0.4rem 0.8rem; text-decoration:none; color: red;"><ion-icon name="trash-outline"></ion-icon></a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</section>

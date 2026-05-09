@@ -1,0 +1,132 @@
+@* DOSYA YOLU: HomiefyC/Views/Shared/_Layout.cshtml *@
+@* Mevcut _Layout.cshtml ile TAMAMEN degistir *@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Homify</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    @Styles.Render("~/Content/css")
+    <link rel="stylesheet" href="~/Content/styles.css" />
+    @Scripts.Render("~/bundles/modernizr")
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script>
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+</head>
+<body>
+    <!-- ================================================================
+         NAVBAR
+    ================================================================ -->
+    <nav class="navbar reveal" style="position: relative; margin-bottom: 20px;">
+        <div class="nav-container">
+            <!-- Logo -->
+            <a href="/Home/Index" class="logo" style="text-decoration:none;">
+                <div class="logo-icon"><ion-icon name="home"></ion-icon></div>
+                <span>Homify</span>
+            </a>
+
+            <!-- Ortak linkler (herkes gorer) -->
+            <div class="nav-links">
+                @Html.ActionLink("Ilanlar", "Index", "LISTINGs", new { area = "" }, new { })
+                @Html.ActionLink("Odalar",  "Index", "ROOMs",    new { area = "" }, new { })
+
+                @* Admin icin ek linkler *@
+                @if (Session["IsAdmin"] != null && (bool)Session["IsAdmin"] == true)
+                {
+                    @Html.ActionLink("Kullanicilar",  "Index", "USERs",       new { area = "" }, new { })
+                    @Html.ActionLink("Kategoriler",   "Index", "CATEGORies",  new { area = "" }, new { })
+                    @Html.ActionLink("Basvurular",    "Index", "APPLICATIONS",new { area = "" }, new { })
+                }
+            </div>
+
+            <!-- Sag taraf: giris / profil -->
+            <div class="nav-actions">
+                <button id="themeToggle" class="theme-switch" aria-label="Toggle Theme">
+                    <ion-icon name="sunny" class="sun-icon"></ion-icon>
+                    <ion-icon name="moon" class="moon-icon"></ion-icon>
+                </button>
+
+                @if (Session["UserID"] != null)
+                {
+                    @* Giris yapilmis: favori, mesaj, profil, cikis *@
+                    <a href="/FAVORITEs/Index" class="nav-link" style="text-decoration:none; margin-right:12px;">
+                        <ion-icon name="heart-outline"></ion-icon>
+                    </a>
+                    <a href="/MESSAGEs/Index" class="nav-link" style="text-decoration:none; margin-right:12px;">
+                        <ion-icon name="chatbubble-outline"></ion-icon>
+                    </a>
+                    <a href="/Profile/Index" class="user-profile" style="text-decoration: none;">
+                        <span>@Session["UserName"]</span>
+                        <img src="https://api.dicebear.com/7.x/notionists/svg?seed=@Session["UserName"]"
+                             alt="Avatar" class="avatar">
+                    </a>
+                    <a href="/USERs/Logout" class="btn-primary"
+                       style="padding: 6px 14px; margin-left:10px; text-decoration:none; background:#ef4444; border-color:#ef4444;">
+                        <span class="btn-text">Cikis <ion-icon name="log-out-outline"></ion-icon></span>
+                    </a>
+                }
+                else
+                {
+                    @* Giris yapilmamis *@
+                    <a href="/USERs/Login" class="btn-primary"
+                       style="padding: 6px 14px; text-decoration:none;">
+                        <span class="btn-text">Giris Yap</span>
+                    </a>
+                    <a href="/USERs/Create"
+                       style="padding: 6px 14px; margin-left:8px; text-decoration:none; color: var(--text-primary); font-weight:600;">
+                        Kayit Ol
+                    </a>
+                }
+            </div>
+        </div>
+    </nav>
+
+    <!-- ================================================================
+         GLOBAL MESAJLAR (TempData)
+    ================================================================ -->
+    @if (TempData["Success"] != null)
+    {
+        <div style="background:#d1fae5; color:#065f46; padding:12px 20px; border-radius:8px;
+                    margin: 0 auto 16px auto; max-width:900px; font-weight:600;">
+            ✓ @TempData["Success"]
+        </div>
+    }
+    @if (TempData["Info"] != null)
+    {
+        <div style="background:#e0f2fe; color:#0369a1; padding:12px 20px; border-radius:8px;
+                    margin: 0 auto 16px auto; max-width:900px; font-weight:600;">
+            ℹ @TempData["Info"]
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div style="background:#fee2e2; color:#991b1b; padding:12px 20px; border-radius:8px;
+                    margin: 0 auto 16px auto; max-width:900px; font-weight:600;">
+            ✗ @TempData["Error"]
+        </div>
+    }
+
+    <!-- ================================================================
+         ICERIK
+    ================================================================ -->
+    <div class="container body-content" style="min-height: 80vh;">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - Homify Next-Gen Roommate Matching</p>
+        </footer>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    <script src="~/Scripts/app.js"></script>
+    @RenderSection("scripts", required: false)
+</body>
+</html>
